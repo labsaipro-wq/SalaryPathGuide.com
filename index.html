@@ -57,7 +57,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=2.2">
+  <link rel="stylesheet" href="styles.css?v=2.3">
+  <style>
+    .modal-overlay.open,
+    .modal-overlay.active {
+      display: flex !important;
+    }
+  </style>
   <!-- Chart.js for trajectory visualization -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -95,7 +101,7 @@
           <option value="CAD">CAD (CA$)</option>
           <option value="AUD">AUD (A$)</option>
         </select>
-        <button id="navSubmitOfferBtn" class="btn btn-outline-white btn-sm" aria-label="Submit Anonymous Compensation">
+        <button id="navSubmitOfferBtn" class="btn btn-outline-white btn-sm" aria-label="Submit Anonymous Compensation" onclick="document.getElementById('submitOfferModal').classList.add('open','active')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -140,7 +146,7 @@
     <a href="#negotiation" class="nav-link">Salary Negotiation Playbook</a>
     <a href="#resources" class="nav-link">Career Prep Resources</a>
     <button id="mobileCompareBtn" class="btn btn-outline-white btn-sm" style="width: 100%;">Compare Job Bands</button>
-    <button id="mobileSubmitOfferBtn" class="btn btn-outline-white btn-sm" style="width: 100%;">+ Submit Anonymous Offer</button>
+    <button id="mobileSubmitOfferBtn" class="btn btn-outline-white btn-sm" style="width: 100%;" onclick="document.getElementById('submitOfferModal').classList.add('open','active'); document.getElementById('mobileDrawer').classList.add('hidden');">+ Submit Anonymous Offer</button>
     <a href="#calculator" class="btn btn-emerald btn-sm" style="width: 100%;">Calculate My Trajectory</a>
   </div>
 
@@ -946,7 +952,7 @@
     <div class="modal-container" style="max-width: 580px;">
       <div class="modal-header">
         <h3 class="modal-title" id="submitOfferModalTitle">🔒 Submit Anonymous Compensation Data</h3>
-        <button class="modal-close-btn" id="submitOfferModalClose" aria-label="Close submit offer modal">✕</button>
+        <button class="modal-close-btn" id="submitOfferModalClose" aria-label="Close submit offer modal" onclick="document.getElementById('submitOfferModal').classList.remove('open','active')">✕</button>
       </div>
       <div class="modal-body">
         <p style="font-size: 0.875rem; color: var(--slate-text-muted); margin-bottom: 1.25rem;">
@@ -960,7 +966,16 @@
             </div>
             <div class="form-group">
               <label class="form-label" for="subRole">Role / Specialty</label>
-              <select id="subRole" class="form-select"></select>
+              <select id="subRole" class="form-select">
+                <option value="Software Engineer">Software Engineer (Engineering)</option>
+                <option value="General Dentist">General Dentist (Healthcare)</option>
+                <option value="Physician / Doctor">Physician / Doctor (Healthcare)</option>
+                <option value="Corporate Attorney">Corporate Attorney (Legal)</option>
+                <option value="Product Manager">Product Manager (Product)</option>
+                <option value="Investment Banking Analyst">Investment Banking Analyst (Finance)</option>
+                <option value="FinTech Quant Developer">FinTech Quant Developer (Finance)</option>
+                <option value="QA Automation Engineer">QA Automation Engineer (Engineering)</option>
+              </select>
             </div>
           </div>
 
@@ -1004,7 +1019,7 @@
 
           <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
             <button type="submit" class="btn btn-emerald btn-sm" style="flex: 1;">Submit Anonymous Record</button>
-            <button type="button" id="submitOfferCancelBtn" class="btn btn-outline-dark btn-sm">Cancel</button>
+            <button type="button" id="submitOfferCancelBtn" class="btn btn-outline-dark btn-sm" onclick="document.getElementById('submitOfferModal').classList.remove('open','active')">Cancel</button>
           </div>
         </form>
       </div>
@@ -1060,7 +1075,7 @@
           <ul class="footer-links">
             <li><a href="#calculator">5-Year Trajectory Calculator</a></li>
             <li><a href="#offer-evaluator">Offer Evaluator &amp; Counter-Generator</a></li>
-            <li><a href="#" id="footerSubmitOfferTrigger">Submit Anonymous Pay Data</a></li>
+            <li><a href="#" id="footerSubmitOfferTrigger" onclick="event.preventDefault(); document.getElementById('submitOfferModal').classList.add('open','active');">Submit Anonymous Pay Data</a></li>
             <li><a href="#negotiation">Salary Negotiation Scripts</a></li>
             <li><a href="#resources">System Design Blueprint</a></li>
             <li><a href="#" id="footerCompareTrigger">Compare Pay Bands</a></li>
@@ -1087,7 +1102,7 @@
   </footer>
 
   <!-- App Data and Scripts -->
-  <script src="data/careerData.js?v=2.2"></script>
-  <script src="app.js?v=2.2"></script>
+  <script src="data/careerData.js?v=2.3"></script>
+  <script src="app.js?v=2.3"></script>
 </body>
 </html>
