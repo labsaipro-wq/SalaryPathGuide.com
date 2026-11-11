@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SalaryPathGuide — Career Compensation Intelligence & 5-Year Trajectory Tool</title>
+  <meta name="description" content="Map your career trajectory, benchmark tech salary pay bands from L3 to L7, and calculate your 5-year compounded income growth potential.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Chart.js for trajectory visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar" id="navbar">
+    <div class="container">
+      <a href="#hero" class="nav-brand">
+        <div class="brand-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+        </div>
+        <div class="brand-text">SalaryPath<span>Guide</span></div>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#hero" class="nav-link active">Home</a></li>
+          <li><a href="#calculator" class="nav-link">5-Yr Calculator</a></li>
+          <li><a href="#career-paths" class="nav-link">Career Ladders</a></li>
+          <li><a href="#negotiation" class="nav-link">Negotiation Playbook</a></li>
+          <li><a href="#resources" class="nav-link">Career Resources</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <select id="currencySelector" class="form-select btn-sm currency-select" aria-label="Select Currency">
+          <option value="USD" selected>USD ($)</option>
+          <option value="EUR">EUR (€)</option>
+          <option value="GBP">GBP (£)</option>
+          <option value="CAD">CAD (CA$)</option>
+          <option value="AUD">AUD (A$)</option>
+        </select>
+        <button id="navCompareBtn" class="btn btn-outline-white btn-sm" aria-label="Compare Compensation Bands">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="8" height="18" rx="1"></rect>
+            <rect x="14" y="3" width="8" height="18" rx="1"></rect>
+          </svg>
+          Compare Bands
+        </button>
+        <a href="#calculator" class="btn btn-emerald btn-sm">Calculate Trajectory</a>
+        <button class="nav-mobile-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation Menu">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-drawer hidden" id="mobileDrawer">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
+      <span style="font-size: 0.8125rem; color: #94A3B8; font-weight: 600;">Currency:</span>
+      <select id="mobileCurrencySelector" class="form-select btn-sm currency-select" style="width: auto;">
+        <option value="USD" selected>USD ($)</option>
+        <option value="EUR">EUR (€)</option>
+        <option value="GBP">GBP (£)</option>
+        <option value="CAD">CAD (CA$)</option>
+        <option value="AUD">AUD (A$)</option>
+      </select>
+    </div>
+    <a href="#hero" class="nav-link">Home</a>
+    <a href="#calculator" class="nav-link">5-Year Calculator</a>
+    <a href="#career-paths" class="nav-link">Career Ladders & Directory</a>
+    <a href="#negotiation" class="nav-link">Salary Negotiation Playbook</a>
+    <a href="#resources" class="nav-link">Career Prep Resources</a>
+    <button id="mobileCompareBtn" class="btn btn-outline-white btn-sm" style="width: 100%;">Compare Job Bands</button>
+    <a href="#calculator" class="btn btn-emerald btn-sm" style="width: 100%;">Calculate My Trajectory</a>
+  </div>
+
+  <main>
+    <!-- 1. Hero Header & Quick-Search Section -->
+    <section class="hero-section" id="hero">
+      <div class="hero-glow"></div>
+      <div class="container hero-content">
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>
+          2026 Compensation &amp; Leveling Intelligence &bull; Healthcare, Tech &amp; Corporate
+        </div>
+
+        <h1 class="hero-title">
+          Map Your Career Trajectory &amp; <span class="gradient-text">Unlock Pay Bands</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Explore job levels, benchmark salary progressions, and project your 5-year earnings potential across healthcare, engineering, product, and finance.
+        </p>
+
+        <!-- Interactive Search Bar with Autocomplete -->
+        <div class="search-container">
+          <div class="search-box">
+            <div class="search-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+            </div>
+            <input 
+              type="text" 
+              id="roleSearchInput" 
+              class="search-input" 
+              placeholder="Search roles (e.g. General Dentist, Software Engineer, Physician, Product Manager, Attorney)..." 
+              autocomplete="off"
+              aria-label="Search job roles"
+            >
+            <button id="searchClearBtn" class="search-clear-btn" aria-label="Clear Search Input">✕</button>
+            <button id="searchSubmitBtn" class="btn btn-emerald btn-sm">Explore Band</button>
+          </div>
+
+          <!-- Autocomplete Dropdown List -->
+          <div class="search-results-dropdown" id="searchResultsDropdown"></div>
+
+          <!-- Trending Role Quick Chips -->
+          <div class="trending-chips">
+            <span class="trending-label">Trending Tracks:</span>
+            <button class="chip-btn" data-role="dentist">🦷 General Dentist</button>
+            <button class="chip-btn" data-role="swe">Software Engineer</button>
+            <button class="chip-btn" data-role="physician">🩺 Physician (MD)</button>
+            <button class="chip-btn" data-role="quant">FinTech Quant</button>
+            <button class="chip-btn" data-role="attorney">⚖️ Corporate Attorney</button>
+            <button class="chip-btn" data-role="qa">QA Automation</button>
+            <button class="chip-btn" data-role="pm">Product Manager</button>
+            <button class="chip-btn" data-role="ib">Investment Banking</button>
+          </div>
+        </div>
+
+        <!-- Hero Compensation Insights Ticker -->
+        <div class="hero-metrics">
+          <div class="hero-metric-card">
+            <div class="hero-metric-val emerald">$185,000</div>
+            <div class="hero-metric-label">Median Healthcare &amp; Senior Base</div>
+          </div>
+          <div class="hero-metric-card">
+            <div class="hero-metric-val">+18.4%</div>
+            <div class="hero-metric-label">Avg. Promotion Leap</div>
+          </div>
+          <div class="hero-metric-card">
+            <div class="hero-metric-val">14 Tracks</div>
+            <div class="hero-metric-label">Healthcare, Tech &amp; Finance</div>
+          </div>
+          <div class="hero-metric-card">
+            <div class="hero-metric-val emerald">18,500+</div>
+            <div class="hero-metric-label">Verified Market Offers</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Interactive Component: 5-Year Salary Trajectory Calculator -->
+    <section class="section section-slate" id="calculator">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag section-tag-emerald">Interactive Trajectory Modeler</div>
+          <h2 class="section-title">5-Year Salary Trajectory Calculator</h2>
+          <p class="section-desc">
+            Simulate your financial future by modeling annual merit raises, target promotion cycles, and compounding bonuses over a 5-year horizon.
+          </p>
+        </div>
+
+        <div class="calc-wrapper">
+          <div class="calc-grid">
+            <!-- Left Controls Column -->
+            <div class="calc-controls-col">
+              <div class="calc-controls-header">
+                <div class="calc-controls-title">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                  </svg>
+                  Parameters &amp; Inputs
+                </div>
+                <p class="calc-controls-desc">Adjust sliders to model salary compounding in real-time.</p>
+              </div>
+
+              <!-- Input: Job Title -->
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label class="form-label" for="calcJobTitle">Current Job Track</label>
+                  <span class="form-badge" id="calcTrackBadge">Engineering</span>
+                </div>
+                <select id="calcJobTitle" class="form-select"></select>
+              </div>
+
+              <!-- Input: Current Base Salary -->
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label class="form-label" for="calcBaseSalary">Current Annual Base Salary</label>
+                  <span class="form-badge" id="calcBaseBadge">$112,000</span>
+                </div>
+                <div class="currency-input-wrap">
+                  <span class="currency-symbol">$</span>
+                  <input type="number" id="calcBaseSalary" class="form-input" min="30000" max="600000" step="1000" value="112000">
+                </div>
+                <div class="slider-container">
+                  <input type="range" id="calcBaseSalarySlider" class="form-range" min="40000" max="350000" step="2500" value="112000">
+                  <div class="slider-ticks">
+                    <span>$40k</span>
+                    <span>$120k</span>
+                    <span>$200k</span>
+                    <span>$350k</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Input: Annual Raise % -->
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label class="form-label" for="calcAnnualRaise">Expected Annual Merit Raise %</label>
+                  <span class="form-badge" id="calcRaiseBadge">4.0%</span>
+                </div>
+                <div class="slider-container">
+                  <input type="range" id="calcAnnualRaise" class="form-range" min="1" max="15" step="0.5" value="4">
+                  <div class="slider-ticks">
+                    <span>1% (CoL)</span>
+                    <span>4% (Standard)</span>
+                    <span>10% (Top Perf)</span>
+                    <span>15%</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Input: Promotion Interval -->
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label class="form-label" for="calcPromoInterval">Target Promotion Interval</label>
+                  <span class="form-badge" id="calcPromoBadge">Every 2 Years</span>
+                </div>
+                <select id="calcPromoInterval" class="form-select">
+                  <option value="1">Every 1 Year (Aggressive / High Growth)</option>
+                  <option value="2" selected>Every 2 Years (Fast-Track Tech Standard)</option>
+                  <option value="3">Every 3 Years (Standard Corporate Tenure)</option>
+                  <option value="0">None (Merit Increases Only)</option>
+                </select>
+              </div>
+
+              <!-- Input: Promotion Bump % -->
+              <div class="form-group">
+                <div class="form-label-row">
+                  <label class="form-label" for="calcPromoBump">Promotion Salary Bump %</label>
+                  <span class="form-badge" id="calcBumpBadge">15%</span>
+                </div>
+                <div class="slider-container">
+                  <input type="range" id="calcPromoBump" class="form-range" min="5" max="30" step="1" value="15">
+                  <div class="slider-ticks">
+                    <span>5%</span>
+                    <span>15% (Typical)</span>
+                    <span>22%</span>
+                    <span>30% (Senior Leap)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Advanced Settings Accordion -->
+              <div>
+                <button type="button" class="advanced-toggle-btn" id="advancedToggleBtn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="advArrow">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                  <span>Advanced Parameters (Bonus &amp; Geo-Tier)</span>
+                </button>
+
+                <div class="advanced-options" id="advancedOptionsPanel">
+                  <div class="form-group">
+                    <div class="form-label-row">
+                      <label class="form-label" for="calcBonusPct">Target Annual Bonus %</label>
+                      <span class="form-badge" id="calcBonusBadge">10%</span>
+                    </div>
+                    <input type="range" id="calcBonusPct" class="form-range" min="0" max="30" step="1" value="10">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" for="calcLocationTier">Location Cost-of-Living Tier</label>
+                    <select id="calcLocationTier" class="form-select">
+                      <option value="1.00">Tier 1: SF Bay Area / NYC / Seattle (100%)</option>
+                      <option value="0.90">Tier 2: Austin / Boston / LA / Chicago (90%)</option>
+                      <option value="0.82">Tier 3: Denver / Atlanta / Dallas / Remote US (82%)</option>
+                      <option value="0.74">Tier 4: London / Toronto / Berlin / Sydney (74%)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" style="padding-top: 0.5rem; border-top: 1px dashed var(--slate-border);">
+                    <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.8125rem;">
+                      <input type="checkbox" id="calcInflationToggle" style="accent-color: var(--emerald-primary); width: 16px; height: 16px; cursor: pointer;">
+                      <span>Adjust for Inflation (Real Purchasing Power @ 2.8%/yr)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="calc-actions">
+                <button type="button" id="resetCalcBtn" class="btn btn-outline-dark btn-sm" style="flex: 1;">Reset Defaults</button>
+                <button type="button" id="copySummaryBtn" class="btn btn-emerald btn-sm" style="flex: 1;">Copy Summary</button>
+              </div>
+            </div>
+
+            <!-- Right Results Column -->
+            <div class="calc-results-col">
+              <!-- Dynamic Metric Cards (KPIs) -->
+              <div class="kpi-grid">
+                <div class="kpi-card kpi-card-featured">
+                  <div class="kpi-label">5-Year Cumulative Earnings</div>
+                  <div class="kpi-val" id="kpiTotalEarnings">$842,650</div>
+                  <div class="kpi-subtext">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                      <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                    Sum of base pay &amp; performance bonus
+                  </div>
+                </div>
+
+                <div class="kpi-card">
+                  <div class="kpi-label">Compounded Growth</div>
+                  <div class="kpi-val emerald" id="kpiCompoundedGrowth">+68.4%</div>
+                  <div class="kpi-subtext" id="kpiEndingBase">Ending Base: $188,600 / yr</div>
+                </div>
+
+                <div class="kpi-card">
+                  <div class="kpi-label">Promotion Value Added</div>
+                  <div class="kpi-val" id="kpiPromoAdvantage">+$118,400</div>
+                  <div class="kpi-subtext">Extra earnings vs merit raises alone</div>
+                </div>
+              </div>
+
+              <!-- Visual Trajectory Chart Card -->
+              <div class="chart-card">
+                <div class="chart-header">
+                  <div class="chart-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="18" y1="20" x2="18" y2="10"></line>
+                      <line x1="12" y1="20" x2="12" y2="4"></line>
+                      <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                    5-Year Annual Compensation Trajectory
+                  </div>
+                  <div class="chart-legend">
+                    <div class="legend-item">
+                      <span class="legend-color legend-color-base"></span>
+                      <span>Annual Base Salary</span>
+                    </div>
+                    <div class="legend-item">
+                      <span class="legend-color legend-color-bonus"></span>
+                      <span>Annual Bonus</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="chart-canvas-container">
+                  <canvas id="trajectoryChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Year-by-Year Salary Progression Table -->
+              <div class="progression-table-container">
+                <table class="progression-table" id="progressionTable">
+                  <thead>
+                    <tr>
+                      <th>Year</th>
+                      <th>Level / Milestone</th>
+                      <th>Base Salary</th>
+                      <th>Merit Raise</th>
+                      <th>Promo Bump</th>
+                      <th>Annual Bonus</th>
+                      <th>Total Annual Comp</th>
+                      <th>Cumulative Total</th>
+                    </tr>
+                  </thead>
+                  <tbody id="progressionTableBody">
+                    <!-- Populated dynamically via app.js -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Footer Toolbar -->
+              <div class="calc-footer-toolbar">
+                <p class="calc-disclaimer">
+                  * Projections assume consistent merit performance and on-schedule leveling evaluations. Figures benchmarked against 2026 tech compensation bands.
+                </p>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button type="button" id="downloadCsvBtn" class="btn btn-outline-dark btn-sm">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download CSV
+                  </button>
+                  <button type="button" id="printReportBtn" class="btn btn-outline-dark btn-sm">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                      <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Print / Save PDF
+                  </button>
+                  <a href="#negotiation" class="btn btn-emerald btn-sm">Negotiate Your Next Band →</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Programmatic Career Path Directory (Sample Data Grid) -->
+    <section class="section section-white" id="career-paths">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag section-tag-navy">Programmatic Career Directory</div>
+          <h2 class="section-title">Career Level Ladders &amp; Compensation Bands</h2>
+          <p class="section-desc">
+            Explore leveling stages from Junior (L3) to Principal (L6/L7). Inspect market salary ranges, technical responsibilities, and concrete upskilling paths to reach the next tier.
+          </p>
+        </div>
+
+        <!-- Directory Toolbar (Category Filter + Location Tier) -->
+        <div class="directory-toolbar">
+          <div class="category-filter-group" id="categoryFilterGroup">
+            <button class="filter-pill active" data-category="all">All Fields</button>
+            <button class="filter-pill" data-category="Healthcare">🦷 Healthcare &amp; Dental</button>
+            <button class="filter-pill" data-category="Engineering">Engineering &amp; QA</button>
+            <button class="filter-pill" data-category="Legal & Finance">⚖️ Legal &amp; Finance</button>
+            <button class="filter-pill" data-category="Product">Product Management</button>
+            <button class="filter-pill" data-category="Data & AI">Data &amp; AI</button>
+            <button class="filter-pill" data-category="Security & Ops">Security &amp; Cloud</button>
+            <button class="filter-pill" data-category="Management">Leadership &amp; Management</button>
+          </div>
+
+          <div class="location-tier-selector">
+            <label class="location-tier-label" for="directoryLocationTier">Location Tier:</label>
+            <select id="directoryLocationTier" class="location-tier-select">
+              <option value="1.00">Tier 1: SF / NYC / Seattle (100%)</option>
+              <option value="0.90">Tier 2: Austin / Boston / LA (90%)</option>
+              <option value="0.82">Tier 3: Remote US / Denver (82%)</option>
+              <option value="0.74">Tier 4: London / Toronto / Berlin (74%)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Roles Grid Container -->
+        <div id="careerRolesContainer">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Salary Negotiation Playbook & Script Generator -->
+    <section class="section section-slate" id="negotiation">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag section-tag-emerald">Strategic Compensation Playbook</div>
+          <h2 class="section-title">Salary Negotiation Playbook &amp; Scripts</h2>
+          <p class="section-desc">
+            Verbatim phone and email scripts tested across hundreds of tech offers. Customize placeholders with your targets and negotiate with confidence.
+          </p>
+        </div>
+
+        <div class="playbook-wrapper">
+          <!-- Scenario Tabs -->
+          <div class="playbook-tabs" id="playbookTabs">
+            <!-- Populated dynamically -->
+          </div>
+
+          <!-- Scenario Content Panel -->
+          <div class="playbook-content" id="playbookContent">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- 4 Golden Rules Cards -->
+        <div class="golden-rules-grid">
+          <div class="rule-card">
+            <div class="rule-number">01</div>
+            <h4 class="rule-title">Never Accept in Real-Time</h4>
+            <p class="rule-desc">Always request 48-72 hours to review the full written documentation. Verbal acceptance on the phone strips your bargaining leverage immediately.</p>
+          </div>
+          <div class="rule-card">
+            <div class="rule-number">02</div>
+            <h4 class="rule-title">Negotiate Total Comp, Not Just Base</h4>
+            <p class="rule-desc">If base pay is restricted by HR bands, pivot immediately to sign-on bonuses, equity refreshes, relocation budgets, or accelerated 6-month review cadences.</p>
+          </div>
+          <div class="rule-card">
+            <div class="rule-number">03</div>
+            <h4 class="rule-title">Anchor to Objective Benchmarks</h4>
+            <p class="rule-desc">Frame counter-offers around data percentiles (e.g. 75th percentile for your level) and concrete business impact rather than personal cost-of-living increases.</p>
+          </div>
+          <div class="rule-card">
+            <div class="rule-number">04</div>
+            <h4 class="rule-title">Keep Collaboration at the Center</h4>
+            <p class="rule-desc">Treat the recruiter as an internal ally. Frame negotiations as joint problem-solving: "I want to sign today—help me get this over the finish line."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Monetization & Resource CTA Section -->
+    <section class="section section-white" id="resources">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag section-tag-navy">Career Accelerators &amp; Partner Tools</div>
+          <h2 class="section-title">Resume &amp; Interview Prep Marketplace</h2>
+          <p class="section-desc">
+            Fast-track your promotion and interview performance with industry-vetted prep courses, ATS resume templates, and 1-on-1 negotiation coaches.
+          </p>
+        </div>
+
+        <div class="resources-grid" id="resourcesGrid">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Side-by-Side Level Comparison Modal -->
+  <div class="modal-overlay" id="compareModal" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="compareModalTitle">Compare Job Levels &amp; Compensation Bands</h3>
+        <button class="modal-close-btn" id="compareModalClose" aria-label="Close comparison modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label class="form-label">Position A</label>
+            <select id="compareRoleA" class="form-select"></select>
+            <select id="compareLevelA" class="form-select" style="margin-top: 0.5rem;"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Position B</label>
+            <select id="compareRoleB" class="form-select"></select>
+            <select id="compareLevelB" class="form-select" style="margin-top: 0.5rem;"></select>
+          </div>
+        </div>
+
+        <div id="compareResultView" style="display: flex; flex-direction: column; gap: 1rem;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notice -->
+  <div class="toast-notice" id="toastNotice">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+    <span id="toastMessage">Summary copied to clipboard!</span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand-title">
+            <div class="brand-icon" style="width: 1.75rem; height: 1.75rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                <polyline points="17 6 23 6 23 12"></polyline>
+              </svg>
+            </div>
+            SalaryPathGuide.com
+          </div>
+          <p class="footer-desc">
+            The career compensation intelligence portal empowering professionals to model promotion leaps, benchmark pay bands, and master total compensation.
+          </p>
+          <div style="font-size: 0.8125rem; color: var(--navy-muted);">
+            Data updated quarterly based on verified tech market benchmarks.
+          </div>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Career Ladders</h4>
+          <ul class="footer-links">
+            <li><a href="#career-paths" class="footer-role-link" data-role="dentist">General Dentist &amp; Specialist</a></li>
+            <li><a href="#career-paths" class="footer-role-link" data-role="physician">Physician / Medical Doctor</a></li>
+            <li><a href="#career-paths" class="footer-role-link" data-role="attorney">Corporate Attorney</a></li>
+            <li><a href="#career-paths" class="footer-role-link" data-role="ib">Investment Banking &amp; PE</a></li>
+            <li><a href="#career-paths" class="footer-role-link" data-role="swe">Software Engineer</a></li>
+            <li><a href="#career-paths" class="footer-role-link" data-role="qa">QA Automation / SDET</a></li>
+            <li><a href="#career-paths" class="footer-role-link" data-role="pm">Product Manager</a></li>
+            <li><a href="#career-paths" class="footer-role-link" data-role="quant">FinTech Quant Developer</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Tools &amp; Guides</h4>
+          <ul class="footer-links">
+            <li><a href="#calculator">5-Year Trajectory Calculator</a></li>
+            <li><a href="#negotiation">Salary Negotiation Scripts</a></li>
+            <li><a href="#negotiation">Competing Offer Framework</a></li>
+            <li><a href="#resources">Senior CV Optimization Kit</a></li>
+            <li><a href="#resources">System Design Blueprint</a></li>
+            <li><a href="#" id="footerCompareTrigger">Compare Pay Bands</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">About &amp; Trust</h4>
+          <ul class="footer-links">
+            <li><a href="#hero">Methodology &amp; Data Sources</a></li>
+            <li><a href="#resources">Affiliate Disclosure</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Contact Editorial Team</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>&copy; 2026 SalaryPathGuide.com. All rights reserved. Built for engineering and tech leaders.</div>
+        <div>Fintech Grade Compensation Analytics &bull; Domain: SalaryPathGuide.com</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Data and Scripts -->
+  <script src="data/careerData.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
