@@ -203,6 +203,7 @@ input, select, textarea {
   align-items: center;
   justify-content: space-between;
   height: 4.5rem;
+  gap: 1.5rem;
 }
 
 .nav-brand {
@@ -213,6 +214,7 @@ input, select, textarea {
   font-size: 1.25rem;
   color: #FFFFFF;
   letter-spacing: -0.02em;
+  flex-shrink: 0;
 }
 
 .brand-icon {
@@ -225,33 +227,54 @@ input, select, textarea {
   justify-content: center;
   color: #FFFFFF;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  flex-shrink: 0;
 }
 
 .brand-text span {
   color: var(--emerald-light);
 }
 
+.navbar nav {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  height: 100%;
+  gap: 1.5rem;
   list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.nav-link {
+.nav-links li {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-links .nav-link {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
   color: #D1D5DB;
   font-size: 0.9375rem;
   font-weight: 500;
   transition: color var(--transition-fast);
-  padding: 0.5rem 0.25rem;
+  padding: 0 0.25rem;
   position: relative;
+  white-space: nowrap !important;
+  line-height: 1;
 }
 
-.nav-link:hover, .nav-link.active {
+.nav-links .nav-link:hover, .nav-links .nav-link.active {
   color: #FFFFFF;
 }
 
-.nav-link::after {
+.nav-links .nav-link::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -262,7 +285,7 @@ input, select, textarea {
   transition: width var(--transition-fast);
 }
 
-.nav-link:hover::after, .nav-link.active::after {
+.nav-links .nav-link:hover::after, .nav-links .nav-link.active::after {
   width: 100%;
 }
 
@@ -2041,6 +2064,12 @@ input, select, textarea {
 /* ==========================================================================
    Responsive Breakpoints
    ========================================================================== */
+@media (max-width: 1160px) {
+  #navCompareBtn {
+    display: none !important;
+  }
+}
+
 @media (max-width: 1024px) {
   .nav-links {
     display: none !important;
@@ -2067,6 +2096,19 @@ input, select, textarea {
   }
   .mobile-drawer.hidden {
     display: none !important;
+  }
+  .mobile-drawer .nav-link {
+    display: block;
+    color: #D1D5DB;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    height: auto;
+  }
+  .mobile-drawer .nav-link:hover,
+  .mobile-drawer .nav-link.active {
+    color: var(--emerald-light);
   }
   .calc-grid {
     grid-template-columns: 1fr;
