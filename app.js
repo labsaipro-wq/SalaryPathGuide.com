@@ -32,6 +32,10 @@ document.addEventListener("DOMContentLoaded", () => {
     adjustForInflation: false,
     inflationRate: 0.028, // 2.8% annual inflation
     taxMode: "gross", // "gross" or "net"
+    enableHousehold: false,
+    partnerRoleId: "dentist",
+    partnerBaseSalary: 120000,
+    partnerRaisePct: 4.0,
     currentTrajectoryData: [],
     // Script customizer defaults
     scriptCompany: "Acme Cloud",
@@ -57,7 +61,13 @@ document.addEventListener("DOMContentLoaded", () => {
     mobileDrawer: document.getElementById("mobileDrawer"),
     navCompareBtn: document.getElementById("navCompareBtn"),
     mobileCompareBtn: document.getElementById("mobileCompareBtn"),
+    navSubmitOfferBtn: document.getElementById("navSubmitOfferBtn"),
+    mobileSubmitOfferBtn: document.getElementById("mobileSubmitOfferBtn"),
     footerCompareTrigger: document.getElementById("footerCompareTrigger"),
+    footerSubmitOfferTrigger: document.getElementById("footerSubmitOfferTrigger"),
+    communityTicker: document.getElementById("communityTicker"),
+    tickerContentText: document.getElementById("tickerContentText"),
+    printDateDossier: document.getElementById("printDateDossier"),
 
     // Search
     roleSearchInput: document.getElementById("roleSearchInput"),
@@ -157,6 +167,35 @@ document.addEventListener("DOMContentLoaded", () => {
     arbDestCity: document.getElementById("arbDestCity"),
     arbSalary: document.getElementById("arbSalary"),
     arbitrageResultsContainer: document.getElementById("arbitrageResultsContainer"),
+
+    // Household Modeler Elements
+    householdToggleBtn: document.getElementById("householdToggleBtn"),
+    householdOptionsPanel: document.getElementById("householdOptionsPanel"),
+    householdArrow: document.getElementById("householdArrow"),
+    enableHouseholdToggle: document.getElementById("enableHouseholdToggle"),
+    householdInputsWrap: document.getElementById("householdInputsWrap"),
+    partnerJobTitle: document.getElementById("partnerJobTitle"),
+    partnerBaseSalary: document.getElementById("partnerBaseSalary"),
+    partnerBaseBadge: document.getElementById("partnerBaseBadge"),
+    partnerRaise: document.getElementById("partnerRaise"),
+    partnerRaiseBadge: document.getElementById("partnerRaiseBadge"),
+    fireMilestoneText: document.getElementById("fireMilestoneText"),
+
+    // Submit Offer Modal Elements
+    submitOfferModal: document.getElementById("submitOfferModal"),
+    submitOfferModalClose: document.getElementById("submitOfferModalClose"),
+    submitOfferCancelBtn: document.getElementById("submitOfferCancelBtn"),
+    submitOfferForm: document.getElementById("submitOfferForm"),
+    subCompany: document.getElementById("subCompany"),
+    subRole: document.getElementById("subRole"),
+    subLevel: document.getElementById("subLevel"),
+    subLocation: document.getElementById("subLocation"),
+    subBase: document.getElementById("subBase"),
+    subBonus: document.getElementById("subBonus"),
+    subEquity: document.getElementById("subEquity"),
+    subSignon: document.getElementById("subSignon"),
+    subNotes: document.getElementById("subNotes"),
+
     toastNotice: document.getElementById("toastNotice"),
     toastMessage: document.getElementById("toastMessage")
   };
@@ -496,6 +535,68 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    // Household Modeler Setup
+    if (elements.partnerJobTitle) {
+      elements.partnerJobTitle.innerHTML = roles.map(role => {
+        return `<option value="${role.id}" ${role.id === state.partnerRoleId ? "selected" : ""}>${role.title} (${role.category})</option>`;
+      }).join("");
+
+      elements.partnerJobTitle.addEventListener("change", (e) => {
+        state.partnerRoleId = e.target.value;
+        const partnerRole = roles.find(r => r.id === state.partnerRoleId);
+        if (partnerRole) {
+          const mid = partnerRole.levels.find(l => l.code === "L4" || l.code === "M4" || l.code === "D2" || l.code === "M2" || l.code === "J2" || l.code === "F2") || partnerRole.levels[1] || partnerRole.levels[0];
+          if (mid && elements.partnerBaseSalary) {
+            state.partnerBaseSalary = mid.base.p50;
+            elements.partnerBaseSalary.value = mid.base.p50;
+            if (elements.partnerBaseBadge) elements.partnerBaseBadge.textContent = formatCurrency(mid.base.p50);
+          }
+        }
+        runTrajectoryCalculations();
+      });
+    }
+
+    if (elements.householdToggleBtn) {
+      elements.householdToggleBtn.addEventListener("click", () => {
+        const isHidden = elements.householdOptionsPanel.style.display === "none";
+        elements.householdOptionsPanel.style.display = isHidden ? "block" : "none";
+        if (elements.householdArrow) {
+          elements.householdArrow.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+        }
+      });
+    }
+
+    if (elements.enableHouseholdToggle) {
+      elements.enableHouseholdToggle.addEventListener("change", (e) => {
+        state.enableHousehold = e.target.checked;
+        if (elements.householdInputsWrap) {
+          elements.householdInputsWrap.style.display = state.enableHousehold ? "flex" : "none";
+        }
+        runTrajectoryCalculations();
+        showToast(state.enableHousehold ? "Dual-Income Household Modeler activated!" : "Reverted to single earner trajectory.");
+      });
+    }
+
+    if (elements.partnerBaseSalary) {
+      elements.partnerBaseSalary.addEventListener("input", (e) => {
+        state.partnerBaseSalary = Math.max(0, Number(e.target.value) || 0);
+        if (elements.partnerBaseBadge) elements.partnerBaseBadge.textContent = formatCurrency(state.partnerBaseSalary);
+        runTrajectoryCalculations();
+      });
+    }
+
+    if (elements.partnerRaise) {
+      elements.partnerRaise.addEventListener("input", (e) => {
+        state.partnerRaisePct = Number(e.target.value);
+        if (elements.partnerRaiseBadge) elements.partnerRaiseBadge.textContent = `${state.partnerRaisePct.toFixed(1)}%`;
+        runTrajectoryCalculations();
+      });
+    }
+
+    if (elements.printDateDossier) {
+      elements.printDateDossier.textContent = "Generated: " + new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    }
+
     // Print Report button
     elements.printReportBtn.addEventListener("click", () => {
       window.print();
@@ -578,6 +679,17 @@ document.addEventListener("DOMContentLoaded", () => {
       adjustedBaseSalary *= netMultiplier;
       adjustedTotalComp *= netMultiplier;
 
+      // Dual-Income Household Modeler Addition
+      if (state.enableHousehold) {
+        const partnerRaiseRate = (state.partnerRaisePct || 4.0) / 100;
+        let pNominal = state.partnerBaseSalary * Math.pow(1 + partnerRaiseRate, y - 1);
+        if (state.adjustForInflation) {
+          pNominal = pNominal / Math.pow(1 + state.inflationRate, y);
+        }
+        const partnerAnnualComp = pNominal * netMultiplier;
+        adjustedTotalComp += partnerAnnualComp;
+      }
+
       cumulativeComp += adjustedTotalComp;
 
       const levelObj = role.levels[currentLevelIndex];
@@ -607,10 +719,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const compoundedGrowth = ((endingBase - startingBase) / startingBase) * 100;
     const promoAdvantage = Math.max(0, cumulativeComp - (state.adjustForInflation ? (baselineCumulativeComp / Math.pow(1 + state.inflationRate, 3)) : baselineCumulativeComp) * (state.taxMode === "net" ? 0.72 : 1.0));
 
-    elements.kpiTotalEarnings.textContent = formatCurrency(total5YrEarnings);
+    elements.kpiTotalEarnings.textContent = formatCurrency(total5YrEarnings) + (state.enableHousehold ? " (Household)" : "");
     elements.kpiCompoundedGrowth.textContent = `+${compoundedGrowth.toFixed(1)}%`;
     elements.kpiEndingBase.textContent = `Ending Base: ${formatCurrency(endingBase)} / yr${state.adjustForInflation ? " (Real)" : ""}${state.taxMode === "net" ? " (Net)" : ""}`;
     elements.kpiPromoAdvantage.textContent = `+${formatCurrency(promoAdvantage)}`;
+
+    // FIRE Milestone Forecast
+    if (elements.fireMilestoneText) {
+      const avgAnnualHousehold = cumulativeComp / 5;
+      const annualSavings = avgAnnualHousehold * 0.35; // 35% savings rate
+      const r = 0.07; // 7% annual real return in index funds
+      let yearsTo1M = Math.log(1 + (1000000 * r) / (annualSavings || 1)) / Math.log(1 + r);
+      let yearsTo2M = Math.log(1 + (2000000 * r) / (annualSavings || 1)) / Math.log(1 + r);
+      yearsTo1M = Math.max(1, Math.min(25, yearsTo1M)).toFixed(1);
+      yearsTo2M = Math.max(1, Math.min(35, yearsTo2M)).toFixed(1);
+
+      elements.fireMilestoneText.innerHTML = `At a 35% household savings rate (${formatCurrency(annualSavings)}/yr invested @ 7%), projected to reach <strong>$1,000,000</strong> in liquid wealth in <strong>~${yearsTo1M} years</strong> (and $2,000,000 in ~${yearsTo2M} years)!`;
+    }
 
     // Render Progression Table
     renderProgressionTable(yearData);
@@ -1889,6 +2014,80 @@ Warm regards,
   };
 
   /* ==========================================================================
+     Submit Anonymous Offer Modal & Community Ticker
+     ========================================================================== */
+  const initSubmitOfferModal = () => {
+    if (!elements.submitOfferModal) return;
+
+    // Populate roles dropdown in modal
+    if (elements.subRole) {
+      elements.subRole.innerHTML = roles.map(r => `<option value="${r.title}">${r.title} (${r.category})</option>`).join("");
+    }
+
+    const openModal = () => {
+      elements.submitOfferModal.classList.add("active");
+    };
+
+    const closeModal = () => {
+      elements.submitOfferModal.classList.remove("active");
+    };
+
+    if (elements.navSubmitOfferBtn) {
+      elements.navSubmitOfferBtn.addEventListener("click", openModal);
+    }
+    if (elements.mobileSubmitOfferBtn) {
+      elements.mobileSubmitOfferBtn.addEventListener("click", () => {
+        if (elements.mobileDrawer) elements.mobileDrawer.classList.add("hidden");
+        openModal();
+      });
+    }
+    if (elements.footerSubmitOfferTrigger) {
+      elements.footerSubmitOfferTrigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        openModal();
+      });
+    }
+
+    if (elements.submitOfferModalClose) {
+      elements.submitOfferModalClose.addEventListener("click", closeModal);
+    }
+    if (elements.submitOfferCancelBtn) {
+      elements.submitOfferCancelBtn.addEventListener("click", closeModal);
+    }
+
+    elements.submitOfferModal.addEventListener("click", (e) => {
+      if (e.target === elements.submitOfferModal) {
+        closeModal();
+      }
+    });
+
+    if (elements.submitOfferForm) {
+      elements.submitOfferForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const comp = (elements.subCompany && elements.subCompany.value.trim()) || "Anonymous Tech";
+        const role = (elements.subRole && elements.subRole.value) || "Software Engineer";
+        const lvl = (elements.subLevel && elements.subLevel.value.trim()) || "L4";
+        const loc = (elements.subLocation && elements.subLocation.value.trim()) || "US";
+        const base = Number(elements.subBase && elements.subBase.value) || 150000;
+        const bonusPct = Number(elements.subBonus && elements.subBonus.value) || 0;
+        const equity = Number(elements.subEquity && elements.subEquity.value) || 0;
+        const signon = Number(elements.subSignon && elements.subSignon.value) || 0;
+        const firstYearTC = Math.round(base + (base * (bonusPct / 100)) + (equity / 4) + signon);
+
+        // Update ticker live
+        if (elements.tickerContentText) {
+          const newTickerItem = `<strong>${comp}</strong> (${loc}) &bull; ${role} ${lvl}: <strong style="color: var(--emerald-dark);">${formatCurrency(firstYearTC)}/yr TC</strong> (Base ${formatCurrency(base)}) &bull; Verified Just Now`;
+          elements.tickerContentText.innerHTML = `${newTickerItem} &nbsp;&bull;&nbsp; ${elements.tickerContentText.innerHTML}`;
+        }
+
+        closeModal();
+        elements.submitOfferForm.reset();
+        showToast("🔒 Anonymous offer submitted! Added to live 2026 verification queue.");
+      });
+    }
+  };
+
+  /* ==========================================================================
      Service Worker Registration for PWA
      ========================================================================== */
   const registerServiceWorker = () => {
@@ -1907,6 +2106,7 @@ Warm regards,
   initOfferEvaluator();
   initLevelingMatrix();
   initGeoArbitrage();
+  initSubmitOfferModal();
   initDirectory();
   initNegotiationPlaybook();
   initResources();

@@ -2039,15 +2039,60 @@ input, select, textarea {
   font-size: 0.8125rem;
 }
 
+.print-dossier-header {
+  display: none;
+}
+
+.fire-milestone-card {
+  padding: 1rem;
+  background: var(--emerald-surface);
+  border: 1px solid var(--emerald-border);
+  border-radius: var(--radius-md);
+  margin-top: 0.75rem;
+}
+
+.community-ticker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-pill);
+  padding: 0.4rem 1rem;
+  font-size: 0.8125rem;
+  color: #D1D5DB;
+  max-width: 720px;
+  margin: 1.5rem auto 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.community-ticker-badge {
+  background: var(--emerald-primary);
+  color: #FFFFFF;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
 /* ==========================================================================
    Print Styles for PDF Export
    ========================================================================== */
 @media print {
-  .navbar, .hero-section, .directory-toolbar, .playbook-wrapper, .resources-grid, .footer, .btn, .calc-controls-col {
+  .navbar, .hero-section, .directory-toolbar, .playbook-wrapper, .resources-grid, .footer, .btn, .calc-controls-col, .calc-footer-toolbar, .modal-overlay, .toast-notice {
     display: none !important;
   }
   .section {
-    padding: 1rem 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+  .calc-wrapper {
+    border: none !important;
+    box-shadow: none !important;
   }
   .calc-grid {
     grid-template-columns: 1fr !important;
@@ -2057,7 +2102,20 @@ input, select, textarea {
   }
   body {
     background: #FFFFFF !important;
-    color: #000000 !important;
+    color: #0F172A !important;
+    font-size: 11pt;
+  }
+  .print-dossier-header {
+    display: block !important;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #0A1128;
+  }
+  .progression-table th {
+    background: #0A1128 !important;
+    color: #FFFFFF !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
 

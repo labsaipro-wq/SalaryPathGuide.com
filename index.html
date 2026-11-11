@@ -95,6 +95,13 @@
           <option value="CAD">CAD (CA$)</option>
           <option value="AUD">AUD (A$)</option>
         </select>
+        <button id="navSubmitOfferBtn" class="btn btn-outline-white btn-sm" aria-label="Submit Anonymous Compensation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Submit Offer
+        </button>
         <button id="navCompareBtn" class="btn btn-outline-white btn-sm" aria-label="Compare Compensation Bands">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="2" y="3" width="8" height="18" rx="1"></rect>
@@ -133,6 +140,7 @@
     <a href="#negotiation" class="nav-link">Salary Negotiation Playbook</a>
     <a href="#resources" class="nav-link">Career Prep Resources</a>
     <button id="mobileCompareBtn" class="btn btn-outline-white btn-sm" style="width: 100%;">Compare Job Bands</button>
+    <button id="mobileSubmitOfferBtn" class="btn btn-outline-white btn-sm" style="width: 100%;">+ Submit Anonymous Offer</button>
     <a href="#calculator" class="btn btn-emerald btn-sm" style="width: 100%;">Calculate My Trajectory</a>
   </div>
 
@@ -210,6 +218,12 @@
             <div class="hero-metric-val emerald">18,500+</div>
             <div class="hero-metric-label">Verified Market Offers</div>
           </div>
+        </div>
+
+        <!-- Live Verified Submissions Ticker -->
+        <div class="community-ticker" id="communityTicker">
+          <span class="community-ticker-badge">Live Intel</span>
+          <span id="tickerContentText">Latest: Senior SWE (L5) at Datadog — $345k TC (Austin, TX) • Associate Dentist (D2) — $215k (Denver, CO) • Principal PM — $420k (Remote)</span>
         </div>
       </div>
     </section>
@@ -369,6 +383,68 @@
                 </div>
               </div>
 
+              <!-- Dual-Income Household Modeler Accordion -->
+              <div style="margin-top: 1rem;">
+                <button type="button" class="advanced-toggle-btn" id="householdToggleBtn" style="border-color: rgba(16, 185, 129, 0.4); background: var(--emerald-surface); color: var(--emerald-dark);">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="householdArrow">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  <span>Dual-Income Household Modeler</span>
+                </button>
+
+                <div class="advanced-options" id="householdOptionsPanel" style="display: none; padding-top: 1rem;">
+                  <div style="font-size: 0.8125rem; color: var(--slate-text-muted); margin-bottom: 0.75rem;">
+                    Model joint earnings with a spouse or partner to forecast combined 5-year household net worth and early retirement (FIRE) milestones.
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                      <input type="checkbox" id="enableHouseholdToggle" style="accent-color: var(--emerald-primary); width: 16px; height: 16px; cursor: pointer;">
+                      <span style="font-weight: 700; color: var(--navy-dark);">Enable Partner / Spousal Income</span>
+                    </label>
+                  </div>
+
+                  <div id="householdInputsWrap" style="display: none; flex-direction: column; gap: 1rem;">
+                    <div class="form-group">
+                      <label class="form-label" for="partnerJobTitle">Partner Career Track</label>
+                      <select id="partnerJobTitle" class="form-select"></select>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="form-label-row">
+                        <label class="form-label" for="partnerBaseSalary">Partner Starting Base Salary</label>
+                        <span class="form-badge" id="partnerBaseBadge">$120,000</span>
+                      </div>
+                      <div class="currency-input-wrap">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" id="partnerBaseSalary" class="form-input" min="30000" max="800000" step="2500" value="120000">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="form-label-row">
+                        <label class="form-label" for="partnerRaise">Partner Expected Raise %</label>
+                        <span class="form-badge" id="partnerRaiseBadge">4.0%</span>
+                      </div>
+                      <input type="range" id="partnerRaise" class="form-range" min="1" max="15" step="0.5" value="4">
+                    </div>
+
+                    <!-- FIRE Milestone Box -->
+                    <div class="fire-milestone-card" id="fireMilestoneCard">
+                      <div style="font-weight: 700; font-size: 0.8125rem; color: var(--emerald-dark); display: flex; align-items: center; gap: 0.4rem;">
+                        🔥 Household FIRE Milestone
+                      </div>
+                      <div style="font-size: 0.8125rem; color: var(--slate-text-main); margin-top: 0.35rem;" id="fireMilestoneText">
+                        At a 35% household savings rate, projected to reach <strong>$1,000,000</strong> in liquid wealth in ~3.8 years!
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="calc-actions">
                 <button type="button" id="resetCalcBtn" class="btn btn-outline-dark btn-sm" style="flex: 1;">Reset Defaults</button>
                 <button type="button" id="copySummaryBtn" class="btn btn-emerald btn-sm" style="flex: 1;">Copy Summary</button>
@@ -377,6 +453,20 @@
 
             <!-- Right Results Column -->
             <div class="calc-results-col">
+              <!-- Print / PDF Executive Header -->
+              <div class="print-dossier-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                  <div>
+                    <h1 style="font-size: 20pt; font-weight: 800; color: #0A1128; margin-bottom: 4px;">SalaryPathGuide.com</h1>
+                    <div style="font-size: 11pt; font-weight: 600; color: #10B981;">Executive Compensation &amp; 5-Year Trajectory Dossier</div>
+                  </div>
+                  <div style="text-align: right; font-size: 9pt; color: #64748B;">
+                    <div>Confidential &bull; Prepared for Career Review</div>
+                    <div id="printDateDossier">Generated: 2026 Edition</div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Dynamic Metric Cards (KPIs) -->
               <div class="kpi-grid">
                 <div class="kpi-card kpi-card-featured">
@@ -851,6 +941,76 @@
     </div>
   </div>
 
+  <!-- Anonymous Offer Submission Modal -->
+  <div class="modal-overlay" id="submitOfferModal" role="dialog" aria-modal="true" aria-labelledby="submitOfferModalTitle">
+    <div class="modal-container" style="max-width: 580px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="submitOfferModalTitle">🔒 Submit Anonymous Compensation Data</h3>
+        <button class="modal-close-btn" id="submitOfferModalClose" aria-label="Close submit offer modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.875rem; color: var(--slate-text-muted); margin-bottom: 1.25rem;">
+          Contribute 100% anonymously. No email or login required. Help thousands of candidates benchmark compensation with verified 2026 data.
+        </p>
+        <form id="submitOfferForm">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="subCompany">Company / Employer</label>
+              <input type="text" id="subCompany" class="form-input" placeholder="e.g. Meta, Pacific Dental, Kirkland" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="subRole">Role / Specialty</label>
+              <select id="subRole" class="form-select"></select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="subLevel">Level Code</label>
+              <input type="text" id="subLevel" class="form-input" placeholder="e.g. L5, Senior, D2, 4th Year" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="subLocation">Metro / City</label>
+              <input type="text" id="subLocation" class="form-input" placeholder="e.g. San Francisco, Austin, Remote" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="subBase">Annual Base Salary ($)</label>
+              <input type="number" id="subBase" class="form-input" min="30000" max="1000000" placeholder="175000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="subBonus">Annual Bonus (%)</label>
+              <input type="number" id="subBonus" class="form-input" min="0" max="100" placeholder="15">
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="subEquity">4-Year Equity ($)</label>
+              <input type="number" id="subEquity" class="form-input" min="0" max="3000000" placeholder="240000">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="subSignon">Sign-on Bonus ($)</label>
+              <input type="number" id="subSignon" class="form-input" min="0" max="300000" placeholder="25000">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 1rem;">
+            <label class="form-label" for="subNotes">Negotiation Note / Tip (Optional)</label>
+            <textarea id="subNotes" class="form-input" rows="2" placeholder="e.g. Countered initial base by +10k citing competing Austin offer; recruiter matched in 48h."></textarea>
+          </div>
+
+          <div style="margin-top: 1.5rem; display: flex; gap: 0.75rem;">
+            <button type="submit" class="btn btn-emerald btn-sm" style="flex: 1;">Submit Anonymous Record</button>
+            <button type="button" id="submitOfferCancelBtn" class="btn btn-outline-dark btn-sm">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notice -->
   <div class="toast-notice" id="toastNotice">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -899,9 +1059,9 @@
           <h4 class="footer-col-title">Tools &amp; Guides</h4>
           <ul class="footer-links">
             <li><a href="#calculator">5-Year Trajectory Calculator</a></li>
+            <li><a href="#offer-evaluator">Offer Evaluator &amp; Counter-Generator</a></li>
+            <li><a href="#" id="footerSubmitOfferTrigger">Submit Anonymous Pay Data</a></li>
             <li><a href="#negotiation">Salary Negotiation Scripts</a></li>
-            <li><a href="#negotiation">Competing Offer Framework</a></li>
-            <li><a href="#resources">Senior CV Optimization Kit</a></li>
             <li><a href="#resources">System Design Blueprint</a></li>
             <li><a href="#" id="footerCompareTrigger">Compare Pay Bands</a></li>
           </ul>
