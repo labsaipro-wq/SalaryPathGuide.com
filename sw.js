@@ -1,7 +1,7 @@
 /**
  * SalaryPathGuide - Service Worker for PWA & Offline Support
  */
-const CACHE_NAME = "salarypathguide-v1";
+const CACHE_NAME = "salarypathguide-v2";
 const STATIC_ASSETS = [
   "/",
   "/index.html",

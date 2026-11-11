@@ -1994,16 +1994,19 @@ Warm regards,
     };
 
     elements.geoArbitrageTriggerBtn.addEventListener("click", () => {
+      elements.arbitrageModal.classList.add("open");
       elements.arbitrageModal.classList.add("active");
       updateArbitrage();
     });
 
     elements.arbitrageModalClose.addEventListener("click", () => {
+      elements.arbitrageModal.classList.remove("open");
       elements.arbitrageModal.classList.remove("active");
     });
 
     elements.arbitrageModal.addEventListener("click", (e) => {
       if (e.target === elements.arbitrageModal) {
+        elements.arbitrageModal.classList.remove("open");
         elements.arbitrageModal.classList.remove("active");
       }
     });
@@ -2025,18 +2028,24 @@ Warm regards,
     }
 
     const openModal = () => {
+      elements.submitOfferModal.classList.add("open");
       elements.submitOfferModal.classList.add("active");
     };
 
     const closeModal = () => {
+      elements.submitOfferModal.classList.remove("open");
       elements.submitOfferModal.classList.remove("active");
     };
 
     if (elements.navSubmitOfferBtn) {
-      elements.navSubmitOfferBtn.addEventListener("click", openModal);
+      elements.navSubmitOfferBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        openModal();
+      });
     }
     if (elements.mobileSubmitOfferBtn) {
-      elements.mobileSubmitOfferBtn.addEventListener("click", () => {
+      elements.mobileSubmitOfferBtn.addEventListener("click", (e) => {
+        e.preventDefault();
         if (elements.mobileDrawer) elements.mobileDrawer.classList.add("hidden");
         openModal();
       });
@@ -2049,15 +2058,44 @@ Warm regards,
     }
 
     if (elements.submitOfferModalClose) {
-      elements.submitOfferModalClose.addEventListener("click", closeModal);
+      elements.submitOfferModalClose.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeModal();
+      });
     }
     if (elements.submitOfferCancelBtn) {
-      elements.submitOfferCancelBtn.addEventListener("click", closeModal);
+      elements.submitOfferCancelBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        closeModal();
+      });
     }
 
     elements.submitOfferModal.addEventListener("click", (e) => {
       if (e.target === elements.submitOfferModal) {
         closeModal();
+      }
+    });
+
+    // Delegated click listener as fail-safe for modal triggers
+    document.addEventListener("click", (e) => {
+      const trigger = e.target.closest("#navSubmitOfferBtn, #mobileSubmitOfferBtn, #footerSubmitOfferTrigger");
+      if (trigger) {
+        e.preventDefault();
+        openModal();
+      }
+    });
+
+    // Escape key listener to close modal
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeModal();
+        if (elements.arbitrageModal) {
+          elements.arbitrageModal.classList.remove("open");
+          elements.arbitrageModal.classList.remove("active");
+        }
+        if (elements.compareModal) {
+          elements.compareModal.classList.remove("open");
+        }
       }
     });
 
