@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const { roles, locationTiers, negotiationPlaybook, resources, currencies } = window.CAREER_DATA;
 
   // Google Sheets Webhook URL for crowd-sourced submissions
-  const GOOGLE_SHEET_WEBHOOK_URL = window.SALARYPATH_WEBHOOK_URL || "";
+  const GOOGLE_SHEET_WEBHOOK_URL = window.SALARYPATH_WEBHOOK_URL || "https://script.google.com/macros/s/AKfycby7Gc0q95IjeXdccE5r5EP1HNfC_VBlHKBN_l3f5NGrG5g1jpRrABN2-Brd0MsfBjQV/exec";
 
   /* ==========================================================================
      Global State
