@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const { roles, locationTiers, negotiationPlaybook, resources, currencies } = window.CAREER_DATA;
 
+  // Google Sheets Webhook URL for crowd-sourced submissions
+  const GOOGLE_SHEET_WEBHOOK_URL = window.SALARYPATH_WEBHOOK_URL || "";
+
   /* ==========================================================================
      Global State
      ========================================================================== */
@@ -2110,9 +2113,44 @@ Warm regards,
         const bonusPct = Number(elements.subBonus && elements.subBonus.value) || 0;
         const equity = Number(elements.subEquity && elements.subEquity.value) || 0;
         const signon = Number(elements.subSignon && elements.subSignon.value) || 0;
+        const notes = (elements.subNotes && elements.subNotes.value.trim()) || "";
         const firstYearTC = Math.round(base + (base * (bonusPct / 100)) + (equity / 4) + signon);
 
-        // Update ticker live
+        const payload = {
+          timestamp: new Date().toISOString(),
+          company: comp,
+          role: role,
+          level: lvl,
+          location: loc,
+          baseSalary: base,
+          bonusPct: bonusPct,
+          equity: equity,
+          signon: signon,
+          totalCompYear1: firstYearTC,
+          notes: notes
+        };
+
+        // 1. Instant local persistence in visitor's localStorage
+        try {
+          const stored = JSON.parse(localStorage.getItem("spg_submissions") || "[]");
+          stored.unshift(payload);
+          localStorage.setItem("spg_submissions", JSON.stringify(stored.slice(0, 100)));
+        } catch (storageErr) {}
+
+        // 2. Dispatch to Google Sheets Webhook in background (no-cors mode for Apps Script redirect)
+        const webhookUrl = GOOGLE_SHEET_WEBHOOK_URL || localStorage.getItem("spg_webhook_url");
+        if (webhookUrl && webhookUrl.startsWith("http")) {
+          try {
+            fetch(webhookUrl, {
+              method: "POST",
+              mode: "no-cors",
+              headers: { "Content-Type": "text/plain" },
+              body: JSON.stringify(payload)
+            }).catch(() => {});
+          } catch (netErr) {}
+        }
+
+        // 3. Update Hero Live Intel ticker in real time
         if (elements.tickerContentText) {
           const newTickerItem = `<strong>${comp}</strong> (${loc}) &bull; ${role} ${lvl}: <strong style="color: var(--emerald-dark);">${formatCurrency(firstYearTC)}/yr TC</strong> (Base ${formatCurrency(base)}) &bull; Verified Just Now`;
           elements.tickerContentText.innerHTML = `${newTickerItem} &nbsp;&bull;&nbsp; ${elements.tickerContentText.innerHTML}`;
@@ -2120,9 +2158,19 @@ Warm regards,
 
         closeModal();
         elements.submitOfferForm.reset();
-        showToast("🔒 Anonymous offer submitted! Added to live 2026 verification queue.");
+        showToast("🔒 Anonymous offer submitted! Saved to live 2026 verification queue.");
       });
     }
+
+    // Admin & Developer helpers
+    window.setSalaryWebhook = (url) => {
+      localStorage.setItem("spg_webhook_url", url);
+      console.log("SalaryPathGuide Webhook configured to:", url);
+      return "Webhook configured successfully!";
+    };
+    window.getSalarySubmissions = () => {
+      return JSON.parse(localStorage.getItem("spg_submissions") || "[]");
+    };
   };
 
   /* ==========================================================================
