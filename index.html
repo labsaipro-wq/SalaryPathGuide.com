@@ -3,8 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SalaryPathGuide — Career Compensation Intelligence & 5-Year Trajectory Tool</title>
-  <meta name="description" content="Map your career trajectory, benchmark tech salary pay bands from L3 to L7, and calculate your 5-year compounded income growth potential.">
+  <title>SalaryPathGuide — Career Compensation Intelligence, 5-Year Trajectory & Leveling Engine</title>
+  <meta name="description" content="Map 5-year salary progressions, evaluate written job offers, detect Year 2 sign-on cliffs, and benchmark compensation bands across tech, healthcare, law, and finance.">
+  <link rel="canonical" href="https://salarypathguide.com/">
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://salarypathguide.com/">
+  <meta property="og:site_name" content="SalaryPathGuide">
+  <meta property="og:title" content="SalaryPathGuide — Career Compensation Intelligence & Trajectory Engine">
+  <meta property="og:description" content="Map 5-year salary compounding, evaluate job offers against market percentiles, detect sign-on cliffs, and generate battle-tested counter-offer scripts.">
+
+  <!-- Twitter Meta -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://salarypathguide.com/">
+  <meta name="twitter:title" content="SalaryPathGuide — Career Compensation Intelligence">
+  <meta name="twitter:description" content="Map 5-year salary compounding, evaluate job offers against market percentiles, detect sign-on cliffs, and generate battle-tested counter-offer scripts.">
+
+  <!-- PWA & Mobile Web App Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0A1128">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SalaryPath">
+
+  <!-- Google Rich Results Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "SalaryPathGuide",
+    "url": "https://salarypathguide.com",
+    "description": "Interactive career compensation modeler, 5-year salary trajectory visualizer, cross-company leveling matrix, and offer negotiation counter-proposal generator.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "All",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "featureList": [
+      "5-Year Compounding Salary Trajectory Modeler",
+      "Job Offer Evaluator & Year 2 Sign-on Cliff Detector",
+      "Cross-Company Leveling Equivalence Matrix",
+      "Cost-of-Living Geo-Arbitrage Relocation Calculator",
+      "Verbatim Counter-Offer Email Script Generator",
+      "Client-Side Multi-Currency Conversion & CSV Data Export"
+    ]
+  }
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
@@ -31,7 +80,8 @@
         <ul class="nav-links">
           <li><a href="#hero" class="nav-link active">Home</a></li>
           <li><a href="#calculator" class="nav-link">Calculator</a></li>
-          <li><a href="#career-paths" class="nav-link">Career Ladders</a></li>
+          <li><a href="#offer-evaluator" class="nav-link">Offer Evaluator</a></li>
+          <li><a href="#career-paths" class="nav-link">Leveling Ladders</a></li>
           <li><a href="#negotiation" class="nav-link">Negotiation</a></li>
           <li><a href="#resources" class="nav-link">Resources</a></li>
         </ul>
@@ -78,7 +128,8 @@
     </div>
     <a href="#hero" class="nav-link">Home</a>
     <a href="#calculator" class="nav-link">5-Year Calculator</a>
-    <a href="#career-paths" class="nav-link">Career Ladders & Directory</a>
+    <a href="#offer-evaluator" class="nav-link">Offer Evaluator &amp; Counter-Generator</a>
+    <a href="#career-paths" class="nav-link">Career Ladders &amp; Leveling Matrix</a>
     <a href="#negotiation" class="nav-link">Salary Negotiation Playbook</a>
     <a href="#resources" class="nav-link">Career Prep Resources</a>
     <button id="mobileCompareBtn" class="btn btn-outline-white btn-sm" style="width: 100%;">Compare Job Bands</button>
@@ -179,21 +230,28 @@
             <!-- Left Controls Column -->
             <div class="calc-controls-col">
               <div class="calc-controls-header">
-                <div class="calc-controls-title">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="4" y1="21" x2="4" y2="14"></line>
-                    <line x1="4" y1="10" x2="4" y2="3"></line>
-                    <line x1="12" y1="21" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12" y2="3"></line>
-                    <line x1="20" y1="21" x2="20" y2="16"></line>
-                    <line x1="20" y1="12" x2="20" y2="3"></line>
-                    <line x1="1" y1="14" x2="7" y2="14"></line>
-                    <line x1="9" y1="8" x2="15" y2="8"></line>
-                    <line x1="17" y1="16" x2="23" y2="16"></line>
-                  </svg>
-                  Parameters &amp; Inputs
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                  <div class="calc-controls-title">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="4" y1="21" x2="4" y2="14"></line>
+                      <line x1="4" y1="10" x2="4" y2="3"></line>
+                      <line x1="12" y1="21" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12" y2="3"></line>
+                      <line x1="20" y1="21" x2="20" y2="16"></line>
+                      <line x1="20" y1="12" x2="20" y2="3"></line>
+                      <line x1="1" y1="14" x2="7" y2="14"></line>
+                      <line x1="9" y1="8" x2="15" y2="8"></line>
+                      <line x1="17" y1="16" x2="23" y2="16"></line>
+                    </svg>
+                    Parameters
+                  </div>
+                  <!-- Mode Switch: Gross vs Net -->
+                  <div class="mode-switch-wrap" id="taxModeSwitch">
+                    <button type="button" class="mode-switch-btn active" data-mode="gross">Gross</button>
+                    <button type="button" class="mode-switch-btn" data-mode="net">Take-Home</button>
+                  </div>
                 </div>
-                <p class="calc-controls-desc">Adjust sliders to model salary compounding in real-time.</p>
+                <p class="calc-controls-desc">Adjust sliders to model compounding career earnings.</p>
               </div>
 
               <!-- Input: Job Title -->
@@ -416,8 +474,173 @@
                     </svg>
                     Print / Save PDF
                   </button>
-                  <a href="#negotiation" class="btn btn-emerald btn-sm">Negotiate Your Next Band →</a>
+                  <button type="button" id="geoArbitrageTriggerBtn" class="btn btn-outline-dark btn-sm">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="2" y1="12" x2="22" y2="12"></line>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    Geo-Arbitrage
+                  </button>
+                  <a href="#offer-evaluator" class="btn btn-emerald btn-sm">Evaluate Written Offer →</a>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2b. Interactive Job Offer Evaluator & Counter-Offer Generator -->
+    <section class="section section-white" id="offer-evaluator">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag section-tag-emerald">High-Leverage Counter-Offer Engine</div>
+          <h2 class="section-title">Job Offer Evaluator &amp; Counter-Offer Generator</h2>
+          <p class="section-desc">
+            Break down written offers, expose Year 2 "sign-on cliffs", benchmark equity vesting against 2026 market percentiles, and generate a polite, math-anchored counter-offer letter in seconds.
+          </p>
+        </div>
+
+        <div class="evaluator-wrapper">
+          <div class="evaluator-grid">
+            <!-- Left Controls Column -->
+            <div class="evaluator-controls">
+              <div style="font-weight: 700; font-size: 1.0625rem; color: var(--navy-dark); display: flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="16" y1="13" x2="8" y2="13"></line>
+                  <line x1="16" y1="17" x2="8" y2="17"></line>
+                  <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                Offer Details
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="evalRoleSelect">Target Track &amp; Level</label>
+                <select id="evalRoleSelect" class="form-select"></select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="evalCompany">Company / Employer</label>
+                <input type="text" id="evalCompany" class="form-input" placeholder="e.g. Google, Stripe, Dental Group, BigLaw" value="Stripe">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="evalBaseSalary">Annual Base Salary</label>
+                <div class="currency-input-wrap">
+                  <span class="currency-symbol">$</span>
+                  <input type="number" id="evalBaseSalary" class="form-input" min="30000" max="800000" step="1000" value="165000">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="evalBonusPct">Annual Performance Bonus %</label>
+                <input type="number" id="evalBonusPct" class="form-input" min="0" max="50" step="1" value="15">
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="evalEquityTotal">Total 4-Year Equity / RSU Grant</label>
+                <div class="currency-input-wrap">
+                  <span class="currency-symbol">$</span>
+                  <input type="number" id="evalEquityTotal" class="form-input" min="0" max="2000000" step="5000" value="220000">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="evalSignonBonus">First-Year Sign-on Bonus</label>
+                <div class="currency-input-wrap">
+                  <span class="currency-symbol">$</span>
+                  <input type="number" id="evalSignonBonus" class="form-input" min="0" max="250000" step="2500" value="30000">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="evalCompetingOffer">Competing Offer / Target Anchor</label>
+                <div class="currency-input-wrap">
+                  <span class="currency-symbol">$</span>
+                  <input type="number" id="evalCompetingOffer" class="form-input" min="0" max="1000000" step="5000" value="285000">
+                </div>
+              </div>
+
+              <button type="button" id="evalRecalculateBtn" class="btn btn-emerald btn-sm" style="width: 100%;">Evaluate Offer &amp; Generate Script</button>
+            </div>
+
+            <!-- Right Results Column -->
+            <div class="evaluator-results">
+              <!-- KPI Summary Cards -->
+              <div class="eval-summary-cards">
+                <div class="eval-card eval-card-featured">
+                  <div class="eval-card-title">Year 1 Total Comp</div>
+                  <div class="eval-card-val" id="evalYear1TC">$274,750</div>
+                  <div class="eval-card-note">Includes base, bonus, Y1 stock &amp; sign-on</div>
+                </div>
+                <div class="eval-card">
+                  <div class="eval-card-title">Year 2-4 Normalized</div>
+                  <div class="eval-card-val" id="evalYear2TC">$244,750</div>
+                  <div class="eval-card-note" id="evalCliffDiff">-$30,000 drop after sign-on cliff</div>
+                </div>
+                <div class="eval-card">
+                  <div class="eval-card-title">Market Benchmark</div>
+                  <div class="eval-card-val emerald" id="evalPercentileRank">72nd %ile</div>
+                  <div class="eval-card-note" id="evalBenchmarkLabel">Competitive L5 Senior Offer</div>
+                </div>
+              </div>
+
+              <!-- Sign-on Cliff Warning -->
+              <div class="eval-cliff-alert" id="evalCliffAlert">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div id="evalCliffText">
+                  <strong>Sign-On Cliff Detected:</strong> Your total compensation drops by <span style="font-family: var(--font-mono); font-weight: 700;">$30,000</span> in Year 2 because the sign-on bonus is non-recurring. Use our counter-offer generator to request an equity refresh or structured Year 2 retention bonus.
+                </div>
+              </div>
+
+              <!-- Market Percentile Bar -->
+              <div class="eval-percentile-section">
+                <div class="percentile-header">
+                  <div class="percentile-title">Market Percentile Distribution (Year 1 TC)</div>
+                  <span class="percentile-badge" id="evalPercentileBadge">Top 28% of Offers</span>
+                </div>
+                <div class="percentile-bar-track">
+                  <div class="percentile-bar-fill" id="evalPercentileBar" style="width: 72%;"></div>
+                </div>
+                <div class="percentile-ticks">
+                  <span id="evalTickP25">25th: $210k</span>
+                  <span id="evalTickP50">50th (Median): $245k</span>
+                  <span id="evalTickP75">75th: $280k</span>
+                  <span id="evalTickP90">90th: $325k</span>
+                </div>
+              </div>
+
+              <!-- 4-Year Equity Vesting Breakdown -->
+              <div>
+                <div style="font-weight: 700; font-size: 0.9375rem; color: var(--navy-dark); margin-bottom: 0.75rem;">
+                  4-Year Compensation &amp; Vesting Schedule
+                </div>
+                <div class="vesting-timeline-grid" id="evalVestingGrid">
+                  <!-- Populated dynamically via app.js -->
+                </div>
+              </div>
+
+              <!-- Tailored Counter-Offer Email Box -->
+              <div class="counter-email-box">
+                <div class="counter-email-header">
+                  <div class="counter-email-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    Tailored Counter-Offer Email Script
+                  </div>
+                  <button type="button" id="copyCounterEmailBtn" class="btn btn-emerald btn-sm" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+                    Copy Script
+                  </button>
+                </div>
+                <pre class="counter-email-pre" id="counterEmailPre">Loading tailored counter-offer...</pre>
               </div>
             </div>
           </div>
@@ -436,8 +659,38 @@
           </p>
         </div>
 
+        <!-- View Mode Switch: Track Ladders vs Cross-Company Matrix -->
+        <div class="view-mode-toggle">
+          <button type="button" class="view-mode-btn active" id="viewModeLaddersBtn">Track Ladders (14 Careers)</button>
+          <button type="button" class="view-mode-btn" id="viewModeMatrixBtn">🏢 Cross-Company Leveling Matrix</button>
+        </div>
+
+        <!-- Cross-Company Matrix Container (Initially hidden) -->
+        <div id="crossCompanyMatrixContainer" style="display: none; margin-bottom: 2.5rem;">
+          <div class="matrix-table-wrap">
+            <table class="matrix-table" id="matrixTable">
+              <thead>
+                <tr>
+                  <th>Standard Level</th>
+                  <th>Google</th>
+                  <th>Meta</th>
+                  <th>Amazon</th>
+                  <th>Microsoft</th>
+                  <th>Apple</th>
+                  <th>High Finance / Law</th>
+                  <th>Healthcare / Dental</th>
+                  <th>Median Total Comp</th>
+                </tr>
+              </thead>
+              <tbody id="matrixTableBody">
+                <!-- Populated dynamically via app.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <!-- Directory Toolbar (Category Filter + Location Tier) -->
-        <div class="directory-toolbar">
+        <div class="directory-toolbar" id="directoryToolbar">
           <div class="category-filter-group" id="categoryFilterGroup">
             <button class="filter-pill active" data-category="all">All Fields</button>
             <button class="filter-pill" data-category="Healthcare">🦷 Healthcare &amp; Dental</button>
@@ -557,6 +810,42 @@
 
         <div id="compareResultView" style="display: flex; flex-direction: column; gap: 1rem;">
           <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Geo-Arbitrage Relocation Modal -->
+  <div class="modal-overlay" id="arbitrageModal" role="dialog" aria-modal="true" aria-labelledby="arbitrageModalTitle">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="arbitrageModalTitle">🌍 Cost-of-Living &amp; Geo-Arbitrage Calculator</h3>
+        <button class="modal-close-btn" id="arbitrageModalClose" aria-label="Close geo-arbitrage modal">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.875rem; color: var(--slate-text-muted); margin-bottom: 1.25rem;">
+          Calculate purchasing power parity, net state tax differential, and projected 5-year wealth accumulation between top global talent hubs.
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="arbOriginCity">Current Origin City</label>
+            <select id="arbOriginCity" class="form-select"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="arbDestCity">Destination Relocation City</label>
+            <select id="arbDestCity" class="form-select"></select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top: 1rem;">
+          <label class="form-label" for="arbSalary">Current Annual Total Compensation</label>
+          <div class="currency-input-wrap">
+            <span class="currency-symbol">$</span>
+            <input type="number" id="arbSalary" class="form-input" min="40000" max="1000000" step="5000" value="185000">
+          </div>
+        </div>
+
+        <div id="arbitrageResultsContainer">
+          <!-- Populated dynamically via app.js -->
         </div>
       </div>
     </div>

@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currency: "USD",
     adjustForInflation: false,
     inflationRate: 0.028, // 2.8% annual inflation
+    taxMode: "gross", // "gross" or "net"
     currentTrajectoryData: [],
     // Script customizer defaults
     scriptCompany: "Acme Cloud",
@@ -66,6 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     trendingChips: document.querySelectorAll(".chip-btn"),
 
     // Calculator Inputs
+    taxModeSwitch: document.getElementById("taxModeSwitch"),
     calcJobTitle: document.getElementById("calcJobTitle"),
     calcTrackBadge: document.getElementById("calcTrackBadge"),
     calcBaseSalary: document.getElementById("calcBaseSalary"),
@@ -88,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
     copySummaryBtn: document.getElementById("copySummaryBtn"),
     downloadCsvBtn: document.getElementById("downloadCsvBtn"),
     printReportBtn: document.getElementById("printReportBtn"),
+    geoArbitrageTriggerBtn: document.getElementById("geoArbitrageTriggerBtn"),
 
     // Calculator Outputs
     kpiTotalEarnings: document.getElementById("kpiTotalEarnings"),
@@ -97,10 +100,41 @@ document.addEventListener("DOMContentLoaded", () => {
     progressionTableBody: document.getElementById("progressionTableBody"),
     chartCanvas: document.getElementById("trajectoryChart"),
 
-    // Directory
+    // Offer Evaluator
+    evalRoleSelect: document.getElementById("evalRoleSelect"),
+    evalCompany: document.getElementById("evalCompany"),
+    evalBaseSalary: document.getElementById("evalBaseSalary"),
+    evalBonusPct: document.getElementById("evalBonusPct"),
+    evalEquityTotal: document.getElementById("evalEquityTotal"),
+    evalSignonBonus: document.getElementById("evalSignonBonus"),
+    evalCompetingOffer: document.getElementById("evalCompetingOffer"),
+    evalRecalculateBtn: document.getElementById("evalRecalculateBtn"),
+    evalYear1TC: document.getElementById("evalYear1TC"),
+    evalYear2TC: document.getElementById("evalYear2TC"),
+    evalCliffDiff: document.getElementById("evalCliffDiff"),
+    evalPercentileRank: document.getElementById("evalPercentileRank"),
+    evalBenchmarkLabel: document.getElementById("evalBenchmarkLabel"),
+    evalCliffAlert: document.getElementById("evalCliffAlert"),
+    evalCliffText: document.getElementById("evalCliffText"),
+    evalPercentileBadge: document.getElementById("evalPercentileBadge"),
+    evalPercentileBar: document.getElementById("evalPercentileBar"),
+    evalTickP25: document.getElementById("evalTickP25"),
+    evalTickP50: document.getElementById("evalTickP50"),
+    evalTickP75: document.getElementById("evalTickP75"),
+    evalTickP90: document.getElementById("evalTickP90"),
+    evalVestingGrid: document.getElementById("evalVestingGrid"),
+    counterEmailPre: document.getElementById("counterEmailPre"),
+    copyCounterEmailBtn: document.getElementById("copyCounterEmailBtn"),
+
+    // Directory & Cross-Company Matrix
     categoryFilterGroup: document.getElementById("categoryFilterGroup"),
     directoryLocationTier: document.getElementById("directoryLocationTier"),
     careerRolesContainer: document.getElementById("careerRolesContainer"),
+    viewModeLaddersBtn: document.getElementById("viewModeLaddersBtn"),
+    viewModeMatrixBtn: document.getElementById("viewModeMatrixBtn"),
+    crossCompanyMatrixContainer: document.getElementById("crossCompanyMatrixContainer"),
+    matrixTableBody: document.getElementById("matrixTableBody"),
+    directoryToolbar: document.getElementById("directoryToolbar"),
 
     // Playbook
     playbookTabs: document.getElementById("playbookTabs"),
@@ -117,6 +151,12 @@ document.addEventListener("DOMContentLoaded", () => {
     compareRoleB: document.getElementById("compareRoleB"),
     compareLevelB: document.getElementById("compareLevelB"),
     compareResultView: document.getElementById("compareResultView"),
+    arbitrageModal: document.getElementById("arbitrageModal"),
+    arbitrageModalClose: document.getElementById("arbitrageModalClose"),
+    arbOriginCity: document.getElementById("arbOriginCity"),
+    arbDestCity: document.getElementById("arbDestCity"),
+    arbSalary: document.getElementById("arbSalary"),
+    arbitrageResultsContainer: document.getElementById("arbitrageResultsContainer"),
     toastNotice: document.getElementById("toastNotice"),
     toastMessage: document.getElementById("toastMessage")
   };
@@ -397,6 +437,19 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    // Tax Mode Switch (Gross vs Net Take-Home)
+    if (elements.taxModeSwitch) {
+      elements.taxModeSwitch.querySelectorAll(".mode-switch-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          elements.taxModeSwitch.querySelectorAll(".mode-switch-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          state.taxMode = btn.getAttribute("data-mode");
+          runTrajectoryCalculations();
+          showToast(state.taxMode === "net" ? "Displaying Estimated Net Take-Home (Post-Tax & 401k)" : "Displaying Gross Pre-Tax Total Comp");
+        });
+      });
+    }
+
     // Advanced toggle accordion
     elements.advancedToggleBtn.addEventListener("click", () => {
       const isOpen = elements.advancedOptionsPanel.classList.toggle("open");
@@ -520,6 +573,11 @@ document.addEventListener("DOMContentLoaded", () => {
         adjustedTotalComp = totalAnnualComp / discountFactor;
       }
 
+      // Net Take-Home Mode adjustment (Est. 28% blended deductions)
+      const netMultiplier = state.taxMode === "net" ? 0.72 : 1.0;
+      adjustedBaseSalary *= netMultiplier;
+      adjustedTotalComp *= netMultiplier;
+
       cumulativeComp += adjustedTotalComp;
 
       const levelObj = role.levels[currentLevelIndex];
@@ -532,9 +590,9 @@ document.addEventListener("DOMContentLoaded", () => {
         promoBumpPct: state.promoBumpPct,
         baseSalary: adjustedBaseSalary,
         nominalBaseSalary: runningBase,
-        meritIncrease,
-        promoIncrease,
-        annualBonus: state.adjustForInflation ? (annualBonus / Math.pow(1 + state.inflationRate, y)) : annualBonus,
+        meritIncrease: meritIncrease * netMultiplier,
+        promoIncrease: promoIncrease * netMultiplier,
+        annualBonus: (state.adjustForInflation ? (annualBonus / Math.pow(1 + state.inflationRate, y)) : annualBonus) * netMultiplier,
         totalAnnualComp: adjustedTotalComp,
         cumulativeComp
       });
@@ -544,14 +602,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // KPI Outputs
     const total5YrEarnings = cumulativeComp;
-    const startingBase = initialBase;
+    const startingBase = initialBase * (state.taxMode === "net" ? 0.72 : 1.0);
     const endingBase = yearData[4].baseSalary;
     const compoundedGrowth = ((endingBase - startingBase) / startingBase) * 100;
-    const promoAdvantage = Math.max(0, cumulativeComp - (state.adjustForInflation ? (baselineCumulativeComp / Math.pow(1 + state.inflationRate, 3)) : baselineCumulativeComp));
+    const promoAdvantage = Math.max(0, cumulativeComp - (state.adjustForInflation ? (baselineCumulativeComp / Math.pow(1 + state.inflationRate, 3)) : baselineCumulativeComp) * (state.taxMode === "net" ? 0.72 : 1.0));
 
     elements.kpiTotalEarnings.textContent = formatCurrency(total5YrEarnings);
     elements.kpiCompoundedGrowth.textContent = `+${compoundedGrowth.toFixed(1)}%`;
-    elements.kpiEndingBase.textContent = `Ending Base: ${formatCurrency(endingBase)} / yr${state.adjustForInflation ? " (Real)" : ""}`;
+    elements.kpiEndingBase.textContent = `Ending Base: ${formatCurrency(endingBase)} / yr${state.adjustForInflation ? " (Real)" : ""}${state.taxMode === "net" ? " (Net)" : ""}`;
     elements.kpiPromoAdvantage.textContent = `+${formatCurrency(promoAdvantage)}`;
 
     // Render Progression Table
@@ -1549,13 +1607,310 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /* ==========================================================================
+     Offer Evaluator & Counter-Offer Generator
+     ========================================================================== */
+  const initOfferEvaluator = () => {
+    if (!elements.evalRoleSelect) return;
+
+    // Populate role and level selector
+    const options = [];
+    roles.forEach(r => {
+      r.levels.forEach(l => {
+        options.push(`<option value="${r.id}_${l.code}" ${r.id === "swe" && l.code === "L5" ? "selected" : ""}>${r.title} — ${l.code} (${l.name})</option>`);
+      });
+    });
+    elements.evalRoleSelect.innerHTML = options.join("");
+
+    const calculateEvaluation = () => {
+      const base = Number(elements.evalBaseSalary.value) || 0;
+      const bonusPct = Number(elements.evalBonusPct.value) || 0;
+      const equityTotal = Number(elements.evalEquityTotal.value) || 0;
+      const signon = Number(elements.evalSignonBonus.value) || 0;
+      const competing = Number(elements.evalCompetingOffer.value) || 0;
+      const company = (elements.evalCompany.value || "").trim() || "the hiring team";
+
+      const annualBonus = base * (bonusPct / 100);
+      const annualEquity = equityTotal / 4;
+      const year1TC = base + annualBonus + annualEquity + signon;
+      const year2TC = base + annualBonus + annualEquity;
+      const cliffDiff = signon;
+
+      elements.evalYear1TC.textContent = formatCurrency(year1TC);
+      elements.evalYear2TC.textContent = formatCurrency(year2TC);
+
+      if (cliffDiff > 0) {
+        elements.evalCliffDiff.textContent = `-${formatCurrency(cliffDiff)} drop in Year 2`;
+        elements.evalCliffAlert.style.display = "flex";
+        elements.evalCliffText.innerHTML = `<strong>Sign-On Cliff Detected:</strong> Total compensation drops by <span style="font-family: var(--font-mono); font-weight: 700;">${formatCurrency(cliffDiff)}</span> in Year 2 because the sign-on bonus is non-recurring. Propose an equity refresh or Year 2 retention bonus to bridge this gap.`;
+      } else {
+        elements.evalCliffDiff.textContent = "Stable annual recurring comp";
+        elements.evalCliffAlert.style.display = "none";
+      }
+
+      // Percentile lookup
+      const [roleId, levelCode] = (elements.evalRoleSelect.value || "swe_L5").split("_");
+      const role = roles.find(r => r.id === roleId) || roles[0];
+      const level = role.levels.find(l => l.code === levelCode) || role.levels[2] || role.levels[0];
+
+      const p25TC = level.base.p25 * (1 + (level.bonusPct || 10) / 100) + (level.equityAnnual || 0);
+      const p50TC = level.base.p50 * (1 + (level.bonusPct || 10) / 100) + (level.equityAnnual || 0);
+      const p75TC = level.base.p75 * (1 + (level.bonusPct || 10) / 100) + (level.equityAnnual || 0);
+      const p90TC = level.base.p90 * (1 + (level.bonusPct || 10) / 100) + (level.equityAnnual || 0);
+
+      elements.evalTickP25.textContent = `25th: ${formatCurrency(p25TC)}`;
+      elements.evalTickP50.textContent = `50th: ${formatCurrency(p50TC)}`;
+      elements.evalTickP75.textContent = `75th: ${formatCurrency(p75TC)}`;
+      elements.evalTickP90.textContent = `90th: ${formatCurrency(p90TC)}`;
+
+      let pctRank = 50;
+      if (year1TC <= p25TC) {
+        pctRank = Math.max(10, Math.round((year1TC / p25TC) * 25));
+      } else if (year1TC <= p50TC) {
+        pctRank = Math.round(25 + ((year1TC - p25TC) / (p50TC - p25TC)) * 25);
+      } else if (year1TC <= p75TC) {
+        pctRank = Math.round(50 + ((year1TC - p50TC) / (p75TC - p50TC)) * 25);
+      } else if (year1TC <= p90TC) {
+        pctRank = Math.round(75 + ((year1TC - p75TC) / (p90TC - p75TC)) * 15);
+      } else {
+        pctRank = Math.min(99, Math.round(90 + ((year1TC - p90TC) / (p90TC * 0.3)) * 9));
+      }
+
+      elements.evalPercentileRank.textContent = `${pctRank}th %ile`;
+      elements.evalPercentileBar.style.width = `${Math.min(100, Math.max(5, pctRank))}%`;
+      elements.evalPercentileBadge.textContent = pctRank >= 75 ? `Top ${100 - pctRank}% Tier Offer` : (pctRank >= 50 ? "Competitive Market Median" : "Below Market Median - Negotiate Up");
+      elements.evalBenchmarkLabel.textContent = `${role.title} (${level.code})`;
+
+      // Vesting schedule
+      const vestingYears = [
+        { year: "Year 1", cash: base + annualBonus + signon, equity: annualEquity },
+        { year: "Year 2", cash: base + annualBonus, equity: annualEquity },
+        { year: "Year 3", cash: base + annualBonus, equity: annualEquity },
+        { year: "Year 4", cash: base + annualBonus, equity: annualEquity }
+      ];
+
+      elements.evalVestingGrid.innerHTML = vestingYears.map(v => `
+        <div class="vesting-card">
+          <div class="vesting-year">${v.year}</div>
+          <div class="vesting-cash">${formatCurrency(v.cash)}</div>
+          <div class="vesting-equity">+${formatCurrency(v.equity)} Equity</div>
+        </div>
+      `).join("");
+
+      // Counter-Offer Email Script
+      const targetAnchor = Math.max(competing, Math.round(year1TC * 1.12 / 1000) * 1000);
+      const counterBaseTarget = Math.round(base * 1.08 / 1000) * 1000;
+      const counterEquityTarget = Math.round((equityTotal + (cliffDiff > 0 ? cliffDiff * 2 : 40000)) / 1000) * 1000;
+
+      const emailScript = `Dear ${company} Recruiting Team,
+
+Thank you so much for extending the written offer for the ${level.name} (${level.code}) opportunity. I loved discussing the team's engineering standards and 2026 technical vision throughout the interview process.
+
+After analyzing the total compensation structure and calibrating against market benchmarks for this leveling scope, I would like to propose a tailored adjustment to bring our numbers into optimal alignment:
+
+1. Base Salary: Proposing an adjustment from ${formatCurrency(base)} to ${formatCurrency(counterBaseTarget)}, reflecting my track record in high-leverage execution.${competing > 0 ? `\n2. Competing Consideration: I am concurrently evaluating an active competing offer calibrated at approximately ${formatCurrency(competing)} Year 1 total compensation.` : ""}
+2. Equity & Retention Alignment: Looking at the 4-year schedule, there is a ${formatCurrency(cliffDiff)} step-down in Year 2 when the sign-on bonus concludes. To ensure steady year-over-year compensation, I would welcome either increasing the 4-year equity grant from ${formatCurrency(equityTotal)} to ${formatCurrency(counterEquityTarget)} or structuring an agreed Year 2 retention grant.
+
+${company} is my unequivocal top choice. If we can solidify these adjustments to reach approximately ${formatCurrency(targetAnchor)} in Year 1 total compensation, I am prepared to sign the offer letter immediately and withdraw from all other interview loops.
+
+Thank you again for your partnership and advocacy throughout this process. I look forward to finalizing our start date!
+
+Warm regards,
+[Your Name]`;
+
+      elements.counterEmailPre.textContent = emailScript;
+    };
+
+    // Event listeners
+    [elements.evalRoleSelect, elements.evalBaseSalary, elements.evalBonusPct, elements.evalEquityTotal, elements.evalSignonBonus, elements.evalCompetingOffer, elements.evalCompany].forEach(input => {
+      if (input) input.addEventListener("input", calculateEvaluation);
+    });
+
+    if (elements.evalRecalculateBtn) {
+      elements.evalRecalculateBtn.addEventListener("click", () => {
+        calculateEvaluation();
+        showToast("Offer evaluated and counter-offer letter generated!");
+      });
+    }
+
+    if (elements.copyCounterEmailBtn) {
+      elements.copyCounterEmailBtn.addEventListener("click", () => {
+        const text = elements.counterEmailPre.textContent;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).then(() => {
+            showToast("Counter-offer email script copied to clipboard!");
+          });
+        }
+      });
+    }
+
+    calculateEvaluation();
+  };
+
+  /* ==========================================================================
+     Cross-Company Leveling Equivalence Matrix
+     ========================================================================== */
+  const initLevelingMatrix = () => {
+    if (!elements.viewModeLaddersBtn || !elements.viewModeMatrixBtn) return;
+
+    elements.viewModeLaddersBtn.addEventListener("click", () => {
+      elements.viewModeLaddersBtn.classList.add("active");
+      elements.viewModeMatrixBtn.classList.remove("active");
+      elements.careerRolesContainer.style.display = "block";
+      if (elements.directoryToolbar) elements.directoryToolbar.style.display = "flex";
+      elements.crossCompanyMatrixContainer.style.display = "none";
+    });
+
+    elements.viewModeMatrixBtn.addEventListener("click", () => {
+      elements.viewModeMatrixBtn.classList.add("active");
+      elements.viewModeLaddersBtn.classList.remove("active");
+      elements.careerRolesContainer.style.display = "none";
+      if (elements.directoryToolbar) elements.directoryToolbar.style.display = "none";
+      elements.crossCompanyMatrixContainer.style.display = "block";
+    });
+
+    // Populate matrix table
+    const matrix = (window.CAREER_DATA && window.CAREER_DATA.companyEquivalence) || [];
+    elements.matrixTableBody.innerHTML = matrix.map(m => `
+      <tr>
+        <td>
+          <div style="font-weight: 700; color: var(--navy-dark);">${m.standardLevel}</div>
+          <div style="font-size: 0.75rem; color: var(--slate-text-muted); margin-top: 0.25rem;">${m.scope}</div>
+        </td>
+        <td><span class="matrix-level-badge">${m.google}</span></td>
+        <td><span class="matrix-level-badge">${m.meta}</span></td>
+        <td><span class="matrix-level-badge">${m.amazon}</span></td>
+        <td><span class="matrix-level-badge">${m.microsoft}</span></td>
+        <td><span class="matrix-level-badge">${m.apple}</span></td>
+        <td><span class="matrix-level-badge">${m.finance} / ${m.legal}</span></td>
+        <td><span class="matrix-level-badge">${m.healthcare}</span></td>
+        <td><span class="matrix-comp-badge">${m.medianTC}</span></td>
+      </tr>
+    `).join("");
+  };
+
+  /* ==========================================================================
+     Cost-of-Living & Geo-Arbitrage Relocation Calculator
+     ========================================================================== */
+  const initGeoArbitrage = () => {
+    if (!elements.geoArbitrageTriggerBtn || !elements.arbitrageModal) return;
+
+    const cities = (window.CAREER_DATA && window.CAREER_DATA.geoArbitrage && window.CAREER_DATA.geoArbitrage.cities) || [];
+
+    // Populate dropdowns
+    elements.arbOriginCity.innerHTML = cities.map(c => `<option value="${c.id}" ${c.id === "sf" ? "selected" : ""}>${c.name} (${c.tag})</option>`).join("");
+    elements.arbDestCity.innerHTML = cities.map(c => `<option value="${c.id}" ${c.id === "atx" ? "selected" : ""}>${c.name} (${c.tag})</option>`).join("");
+
+    const updateArbitrage = () => {
+      const originId = elements.arbOriginCity.value;
+      const destId = elements.arbDestCity.value;
+      const salary = Number(elements.arbSalary.value) || 185000;
+
+      const origin = cities.find(c => c.id === originId) || cities[0];
+      const dest = cities.find(c => c.id === destId) || cities[3];
+
+      const taxSavings = salary * ((origin.stateTax - dest.stateTax) / 100);
+      const colRatio = dest.colIndex / origin.colIndex;
+      const equivalentSalary = Math.round(salary * colRatio);
+      const annualPurchasingAdvantage = salary - equivalentSalary;
+      const fiveYearWealthSurplus = Math.max(0, Math.round((annualPurchasingAdvantage + Math.max(0, taxSavings)) * 5));
+
+      elements.arbitrageResultsContainer.innerHTML = `
+        <div class="arbitrage-card">
+          <div class="arbitrage-comparison-grid">
+            <div class="arbitrage-city-box">
+              <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-text-muted); text-transform: uppercase;">Origin Metro</div>
+              <div style="font-weight: 800; font-size: 1.125rem; color: var(--navy-dark); margin: 0.25rem 0 0.75rem;">${origin.name}</div>
+              <div class="arbitrage-stat-row">
+                <span>State Income Tax:</span>
+                <strong style="color: #EF4444;">${origin.stateTax}%</strong>
+              </div>
+              <div class="arbitrage-stat-row">
+                <span>Cost of Living Index:</span>
+                <strong>${origin.colIndex} / 100</strong>
+              </div>
+              <div class="arbitrage-stat-row">
+                <span>Median Home Price:</span>
+                <strong>${origin.housingMedian}</strong>
+              </div>
+            </div>
+
+            <div class="arbitrage-city-box">
+              <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-text-muted); text-transform: uppercase;">Destination Metro</div>
+              <div style="font-weight: 800; font-size: 1.125rem; color: var(--navy-dark); margin: 0.25rem 0 0.75rem;">${dest.name}</div>
+              <div class="arbitrage-stat-row">
+                <span>State Income Tax:</span>
+                <strong style="color: var(--emerald-dark);">${dest.stateTax}%</strong>
+              </div>
+              <div class="arbitrage-stat-row">
+                <span>Cost of Living Index:</span>
+                <strong>${dest.colIndex} / 100</strong>
+              </div>
+              <div class="arbitrage-stat-row">
+                <span>Median Home Price:</span>
+                <strong>${dest.housingMedian}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.25rem; padding: 1.25rem; background: #F8FAFC; border-radius: var(--radius-md); border: 1px solid var(--slate-border);">
+            <div style="font-weight: 700; font-size: 0.9375rem; color: var(--navy-dark); margin-bottom: 0.5rem;">
+              Purchasing Power &amp; Tax Summary
+            </div>
+            <p style="font-size: 0.875rem; color: var(--slate-text-main); line-height: 1.6;">
+              A <strong>${formatCurrency(salary)}</strong> compensation in <strong>${origin.name}</strong> only requires <strong>${formatCurrency(equivalentSalary)}</strong> in <strong>${dest.name}</strong> to afford the same lifestyle.
+              ${taxSavings > 0 ? ` Relocating saves approximately <strong style="color: var(--emerald-dark);">${formatCurrency(taxSavings)} / year</strong> in state income taxes alone.` : ""}
+            </p>
+            <div class="arbitrage-surplus-badge">
+              🚀 Estimated 5-Year Geo-Arbitrage Wealth Surplus: +${formatCurrency(fiveYearWealthSurplus)}
+            </div>
+          </div>
+        </div>
+      `;
+    };
+
+    elements.geoArbitrageTriggerBtn.addEventListener("click", () => {
+      elements.arbitrageModal.classList.add("active");
+      updateArbitrage();
+    });
+
+    elements.arbitrageModalClose.addEventListener("click", () => {
+      elements.arbitrageModal.classList.remove("active");
+    });
+
+    elements.arbitrageModal.addEventListener("click", (e) => {
+      if (e.target === elements.arbitrageModal) {
+        elements.arbitrageModal.classList.remove("active");
+      }
+    });
+
+    elements.arbOriginCity.addEventListener("change", updateArbitrage);
+    elements.arbDestCity.addEventListener("change", updateArbitrage);
+    elements.arbSalary.addEventListener("input", updateArbitrage);
+  };
+
+  /* ==========================================================================
+     Service Worker Registration for PWA
+     ========================================================================== */
+  const registerServiceWorker = () => {
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
+    }
+  };
+
+  /* ==========================================================================
      Bootstrap Application
      ========================================================================== */
   initSearch();
   initCalculator();
+  initOfferEvaluator();
+  initLevelingMatrix();
+  initGeoArbitrage();
   initDirectory();
   initNegotiationPlaybook();
   initResources();
   initCompareModal();
   initNavigation();
+  registerServiceWorker();
 });

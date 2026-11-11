@@ -1128,7 +1128,97 @@ const CAREER_DATA = {
       highlight: "Guaranteed Higher Counter-Offer or Refund",
       icon: "trending-up"
     }
-  ]
+  ],
+
+  // Cross-Company Leveling Equivalence Matrix
+  companyEquivalence: [
+    {
+      standardLevel: "Junior / Entry (0-2 Yrs)",
+      category: "Engineering",
+      google: "L3 (SWE II)",
+      meta: "E3 (Software Engineer)",
+      amazon: "L4 (SDE I)",
+      microsoft: "59 - 60 (SDE)",
+      apple: "ICT2",
+      finance: "Analyst (Year 1-2)",
+      legal: "1st-2nd Year Associate",
+      healthcare: "Associate Dentist (D1) / Resident",
+      medianTC: "$165,000 - $198,000",
+      scope: "Executes well-defined tasks, feature tickets, bug fixes, unit tests with senior technical guidance."
+    },
+    {
+      standardLevel: "Mid-Level (2-5 Yrs)",
+      category: "Engineering",
+      google: "L4 (Software Engineer III)",
+      meta: "E4 (Software Engineer)",
+      amazon: "L5 (SDE II)",
+      microsoft: "61 - 62 (SDE II)",
+      apple: "ICT3",
+      finance: "Associate (Year 1-3)",
+      legal: "3rd-4th Year Associate",
+      healthcare: "Associate Dentist (D2) / Hospitalist (M1)",
+      medianTC: "$240,000 - $315,000",
+      scope: "Autonomously scopes and delivers multi-week initiatives, writes technical RFCs, mentors entry engineers."
+    },
+    {
+      standardLevel: "Senior (5-8 Yrs)",
+      category: "Engineering",
+      google: "L5 (Senior SWE)",
+      meta: "E5 (Senior SWE)",
+      amazon: "L6 (Senior SDE)",
+      microsoft: "63 - 64 (Senior SDE)",
+      apple: "ICT4",
+      finance: "Vice President (VP)",
+      legal: "Senior Associate / Junior Partner",
+      healthcare: "Lead Associate (D3) / Attending Physician (M2)",
+      medianTC: "$360,000 - $445,000",
+      scope: "Architects squad-level systems, eliminates critical cross-service bottlenecks, defines engineering standards."
+    },
+    {
+      standardLevel: "Staff / Lead (8-12 Yrs)",
+      category: "Engineering",
+      google: "L6 (Staff SWE)",
+      meta: "E6 (Staff SWE)",
+      amazon: "L7 (Principal SDE)",
+      microsoft: "65 - 67 (Principal SDE)",
+      apple: "ICT5",
+      finance: "Director / Senior VP",
+      legal: "Equity Partner / Senior Counsel",
+      healthcare: "Clinical Partner (D4) / Dept Chief (M3)",
+      medianTC: "$540,000 - $720,000",
+      scope: "Sets technical roadmaps across multiple business units, leads org-wide architectural transformations."
+    },
+    {
+      standardLevel: "Principal / Director (12+ Yrs)",
+      category: "Engineering",
+      google: "L7+ (Senior Staff / Principal)",
+      meta: "E7+ (Senior Staff / Director)",
+      amazon: "L8 (Senior Principal / VP)",
+      microsoft: "68 - 70 (Partner SDE / Director)",
+      apple: "ICT6 / Distinguished",
+      finance: "Managing Director / Partner",
+      legal: "Managing Partner / General Counsel",
+      healthcare: "Practice Equity Owner (D5) / Medical Director (M4)",
+      medianTC: "$850,000 - $1,350,000+",
+      scope: "Drives multi-year company-level technical strategy, advises executive leadership, impacts nine-figure business outcomes."
+    }
+  ],
+
+  // Cost-of-Living & Geo-Arbitrage Relocation Dataset
+  geoArbitrage: {
+    cities: [
+      { id: "sf", name: "San Francisco / Silicon Valley", stateTax: 9.3, colIndex: 100, rentIndex: 100, housingMedian: "$1,380,000", tag: "Tech Benchmark (100%)" },
+      { id: "nyc", name: "New York City (NY)", stateTax: 10.9, colIndex: 98, rentIndex: 96, housingMedian: "$1,250,000", tag: "Finance & Tech Hub" },
+      { id: "sea", name: "Seattle / Bellevue (WA)", stateTax: 0.0, colIndex: 88, rentIndex: 80, housingMedian: "$890,000", tag: "0% State Income Tax" },
+      { id: "atx", name: "Austin (TX)", stateTax: 0.0, colIndex: 72, rentIndex: 62, housingMedian: "$560,000", tag: "0% State Tax High Growth" },
+      { id: "den", name: "Denver / Boulder (CO)", stateTax: 4.4, colIndex: 76, rentIndex: 68, housingMedian: "$620,000", tag: "Mountain West Tech Hub" },
+      { id: "mia", name: "Miami / Tampa (FL)", stateTax: 0.0, colIndex: 74, rentIndex: 69, housingMedian: "$580,000", tag: "0% State Income Tax" },
+      { id: "chi", name: "Chicago (IL)", stateTax: 4.95, colIndex: 78, rentIndex: 65, housingMedian: "$380,000", tag: "Midwest Economic Center" },
+      { id: "lon", name: "London (UK)", stateTax: 40.0, colIndex: 82, rentIndex: 78, housingMedian: "£650,000", tag: "Global Financial Center" },
+      { id: "tor", name: "Toronto (Canada)", stateTax: 33.0, colIndex: 74, rentIndex: 68, housingMedian: "CA$1,050,000", tag: "Canadian Innovation Corridor" },
+      { id: "rem", name: "Remote (Low/Medium Cost US)", stateTax: 3.5, colIndex: 65, rentIndex: 48, housingMedian: "$360,000", tag: "Maximum Wealth Surplus" }
+    ]
+  }
 };
 
 // Export to window for browser usage

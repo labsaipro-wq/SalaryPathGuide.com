@@ -1,0 +1,11 @@
+{
+  "name": "SalaryPathGuide — Career Compensation Intelligence & Trajectory Engine",
+  "short_name": "SalaryPath",
+  "description": "Interactive career compensation modeler, 5-year salary trajectory visualizer, cross-company leveling matrix, and offer negotiation counter-proposal generator.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A1128",
+  "theme_color": "#0A1128",
+  "orientation": "any",
+  "categories": ["finance", "business", "productivity"]
+}
