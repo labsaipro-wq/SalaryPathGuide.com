@@ -143,6 +143,15 @@ document.addEventListener("DOMContentLoaded", () => {
     counterEmailPre: document.getElementById("counterEmailPre"),
     copyCounterEmailBtn: document.getElementById("copyCounterEmailBtn"),
 
+    // Offer Leverage Diagnostic Elements
+    evalSourceSelect: document.getElementById("evalSourceSelect"),
+    evalPipelineSelect: document.getElementById("evalPipelineSelect"),
+    evalTimelineSelect: document.getElementById("evalTimelineSelect"),
+    evalLeverageScoreBadge: document.getElementById("evalLeverageScoreBadge"),
+    evalRiskScoreBadge: document.getElementById("evalRiskScoreBadge"),
+    evalLeverageBar: document.getElementById("evalLeverageBar"),
+    evalLeverageAdvice: document.getElementById("evalLeverageAdvice"),
+
     // Directory & Cross-Company Matrix
     categoryFilterGroup: document.getElementById("categoryFilterGroup"),
     directoryLocationTier: document.getElementById("directoryLocationTier"),
@@ -1970,10 +1979,72 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `).join("");
 
+      // Offer Leverage & Rescission Risk Diagnostic Calculation
+      const sourceType = (elements.evalSourceSelect && elements.evalSourceSelect.value) || "inbound";
+      const pipelineType = (elements.evalPipelineSelect && elements.evalPipelineSelect.value) || "competing";
+      const timelineType = (elements.evalTimelineSelect && elements.evalTimelineSelect.value) || "flexible";
+
+      let leverageScore = 40;
+      if (sourceType === "inbound") leverageScore += 25;
+      else if (sourceType === "referral") leverageScore += 15;
+      else if (sourceType === "direct") leverageScore += 5;
+
+      if (pipelineType === "competing") leverageScore += 30;
+      else if (pipelineType === "final_rounds") leverageScore += 18;
+      else if (pipelineType === "sole") leverageScore += 8;
+      else if (pipelineType === "urgent") leverageScore -= 10;
+
+      if (timelineType === "flexible") leverageScore += 10;
+      else if (timelineType === "standard") leverageScore += 5;
+      else if (timelineType === "exploding") leverageScore -= 5;
+
+      if (year1TC < p50TC) leverageScore += 10;
+      else if (year1TC >= p75TC) leverageScore -= 5;
+
+      leverageScore = Math.min(98, Math.max(18, leverageScore));
+
+      let rescissionRisk = "Rescission Risk: < 0.2% (Safe)";
+      let leverageLabel = "Dominant Leverage Position";
+      let leverageAdvice = "You hold dominant negotiating leverage. Sunk hiring costs and competing alternatives mean the recruiter is motivated to retain you. Counter confidently for a 12–15% package bump and an equity refresher commitment.";
+
+      if (leverageScore >= 80) {
+        rescissionRisk = "Rescission Risk: < 0.2% (Safe)";
+        leverageLabel = "High Leverage Position";
+        leverageAdvice = "You hold dominant negotiating leverage. Sunk hiring costs and competing options mean the recruiter is motivated to retain you. Counter confidently for a 12–15% package bump and an equity refresher commitment.";
+      } else if (leverageScore >= 60) {
+        rescissionRisk = "Rescission Risk: < 0.8% (Negligible)";
+        leverageLabel = "Solid Leverage Foundation";
+        leverageAdvice = "You hold solid negotiation leverage. Anchor strictly on third-party market data (Levels.fyi / Radford P75) and request a sign-on bonus bridge or review schedule to protect against the Year 2 cliff.";
+      } else {
+        rescissionRisk = "Rescission Risk: ~2.1% (Collaborative Stance)";
+        leverageLabel = "Delicate / Exploratory Leverage";
+        leverageAdvice = "Approach with an inquisitive, collaborative posture rather than firm ultimatums. Express genuine enthusiasm, highlight specific impact areas, and ask if there is flexibility on signing incentives or early performance reviews.";
+      }
+
+      if (elements.evalLeverageScoreBadge) {
+        elements.evalLeverageScoreBadge.textContent = `Leverage: ${leverageScore} / 100`;
+      }
+      if (elements.evalRiskScoreBadge) {
+        elements.evalRiskScoreBadge.textContent = rescissionRisk;
+      }
+      if (elements.evalLeverageBar) {
+        elements.evalLeverageBar.style.width = `${leverageScore}%`;
+      }
+      if (elements.evalLeverageAdvice) {
+        elements.evalLeverageAdvice.innerHTML = `<strong>Diagnostic Recommendation (${leverageLabel}):</strong> ${leverageAdvice}`;
+      }
+
       // Counter-Offer Email Script
       const targetAnchor = Math.max(competing, Math.round(year1TC * 1.12 / 1000) * 1000);
       const counterBaseTarget = Math.round(base * 1.08 / 1000) * 1000;
       const counterEquityTarget = Math.round((equityTotal + (cliffDiff > 0 ? cliffDiff * 2 : 40000)) / 1000) * 1000;
+
+      let pipelineClause = "";
+      if (competing > 0) {
+        pipelineClause = `\n2. Competing Consideration: I am concurrently evaluating an active competing offer calibrated at approximately ${formatCurrency(competing)} Year 1 total compensation.`;
+      } else if (pipelineType === "final_rounds") {
+        pipelineClause = `\n2. Pipeline Context: I am currently in final-round discussions for a peer role, but ${company} remains my unequivocal top preference.`;
+      }
 
       const emailScript = `Dear ${company} Recruiting Team,
 
@@ -1981,8 +2052,8 @@ Thank you so much for extending the written offer for the ${level.name} (${level
 
 After analyzing the total compensation structure and calibrating against market benchmarks for this leveling scope, I would like to propose a tailored adjustment to bring our numbers into optimal alignment:
 
-1. Base Salary: Proposing an adjustment from ${formatCurrency(base)} to ${formatCurrency(counterBaseTarget)}, reflecting my track record in high-leverage execution.${competing > 0 ? `\n2. Competing Consideration: I am concurrently evaluating an active competing offer calibrated at approximately ${formatCurrency(competing)} Year 1 total compensation.` : ""}
-2. Equity & Retention Alignment: Looking at the 4-year schedule, there is a ${formatCurrency(cliffDiff)} step-down in Year 2 when the sign-on bonus concludes. To ensure steady year-over-year compensation, I would welcome either increasing the 4-year equity grant from ${formatCurrency(equityTotal)} to ${formatCurrency(counterEquityTarget)} or structuring an agreed Year 2 retention grant.
+1. Base Salary: Proposing an adjustment from ${formatCurrency(base)} to ${formatCurrency(counterBaseTarget)}, reflecting my track record in high-leverage execution.${pipelineClause}
+${pipelineClause ? "3" : "2"}. Equity & Retention Alignment: Looking at the 4-year schedule, there is a ${formatCurrency(cliffDiff)} step-down in Year 2 when the sign-on bonus concludes. To ensure steady year-over-year compensation, I would welcome either increasing the 4-year equity grant from ${formatCurrency(equityTotal)} to ${formatCurrency(counterEquityTarget)} or structuring an agreed Year 2 retention grant.
 
 ${company} is my unequivocal top choice. If we can solidify these adjustments to reach approximately ${formatCurrency(targetAnchor)} in Year 1 total compensation, I am prepared to sign the offer letter immediately and withdraw from all other interview loops.
 
@@ -1995,8 +2066,13 @@ Warm regards,
     };
 
     // Event listeners
-    [elements.evalRoleSelect, elements.evalBaseSalary, elements.evalBonusPct, elements.evalEquityTotal, elements.evalSignonBonus, elements.evalCompetingOffer, elements.evalCompany].forEach(input => {
+    [
+      elements.evalRoleSelect, elements.evalBaseSalary, elements.evalBonusPct,
+      elements.evalEquityTotal, elements.evalSignonBonus, elements.evalCompetingOffer,
+      elements.evalCompany, elements.evalSourceSelect, elements.evalPipelineSelect, elements.evalTimelineSelect
+    ].forEach(input => {
       if (input) input.addEventListener("input", calculateEvaluation);
+      if (input) input.addEventListener("change", calculateEvaluation);
     });
 
     if (elements.evalRecalculateBtn) {

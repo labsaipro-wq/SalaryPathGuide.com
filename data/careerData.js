@@ -966,6 +966,88 @@ const CAREER_DATA = {
           upskillPath: ["Drive billion-dollar cross-border mega-mergers and lead private equity buyout fund closes."]
         }
       ]
+    },
+    {
+      id: "ai_research",
+      title: "AI Research Scientist & Foundation Model Engineer",
+      category: "Data & AI",
+      shortDesc: "Pioneers generative foundation models, distributed LLM pretraining architectures, post-training alignment (RLHF/DPO), and GPU acceleration kernels.",
+      marketGrowth: "+28.4% YoY (Highest in Tech)",
+      topSpecialties: ["Distributed Pretraining (Megatron/FSDP)", "GPU Kernel Optimization (Triton/CUDA)", "Post-Training Alignment (RLHF/DPO)", "Multimodal & Reasoning Architectures"],
+      levels: [
+        {
+          code: "R3",
+          name: "Research Engineer / Associate MTS",
+          yoe: "0 - 2 Years (Ph.D. / MS)",
+          base: { p25: 145000, p50: 170000, p75: 200000, p90: 235000 },
+          bonusPct: 15,
+          equityAnnual: 85000,
+          scope: "Conducts model fine-tuning experiments, writes synthetic data pipelines, benchmarks inference latency, and evaluates loss curves under principal mentorship.",
+          skills: ["PyTorch / JAX", "Hugging Face / vLLM", "Distributed Training Basics", "Python & CUDA C++", "Empirical Evaluation Rubrics"],
+          upskillPath: [
+            "Implement novel loss functions and attention mechanisms from recent NeurIPS/ICLR papers.",
+            "Scale dataset curation pipelines to filter 10B+ high-quality multi-modal tokens.",
+            "Master GPU profiling with NVIDIA Nsight and PyTorch Profiler."
+          ]
+        },
+        {
+          code: "R4",
+          name: "Member of Technical Staff (MTS) / AI Scientist",
+          yoe: "2 - 5 Years",
+          base: { p25: 195000, p50: 230000, p75: 275000, p90: 320000 },
+          bonusPct: 20,
+          equityAnnual: 175000,
+          scope: "Autonomously designs model architecture iterations, trains 7B–70B parameter models, debugs distributed cluster GPU hangs, and leads alignment workstreams.",
+          skills: ["Megatron-LM & DeepSpeed", "Custom Triton Kernels", "RLHF / DPO / PPO Algorithms", "Cluster InfiniBand Debugging", "Quantization (FP8/INT4)"],
+          upskillPath: [
+            "Lead a core milestone in pretraining or post-training reaching state-of-the-art benchmarks.",
+            "Author impactful research papers or high-profile open-source weights releases.",
+            "Design custom attention kernels cutting inference memory footprint by 40%."
+          ]
+        },
+        {
+          code: "R5",
+          name: "Senior Research Scientist / Senior MTS",
+          yoe: "5 - 8 Years",
+          base: { p25: 260000, p50: 310000, p75: 380000, p90: 450000 },
+          bonusPct: 25,
+          equityAnnual: 340000,
+          scope: "Architects frontier model capabilities (reasoning, agentic tool use, multimodality). Directs multi-million dollar compute allocations across 10,000+ GPU clusters.",
+          skills: ["Frontier Model Architecture", "Multi-Node Compute Scaling", "Algorithmic Alignment Frontiers", "Long-Context Attention (1M+ Tokens)", "Research Strategy"],
+          upskillPath: [
+            "Pioneer novel reasoning paradigms that unlock step-function capabilities.",
+            "Drive corporate compute roadmap and strategic partnership bets with hardware vendors.",
+            "Mentor junior research fellows and represent the organization in frontier AI safety forums."
+          ]
+        },
+        {
+          code: "R6",
+          name: "Staff / Principal Research Scientist",
+          yoe: "8 - 12+ Years",
+          base: { p25: 340000, p50: 420000, p75: 520000, p90: 650000 },
+          bonusPct: 30,
+          equityAnnual: 600000,
+          scope: "World-renowned research authority. Directs core foundation model family roadmap (GPT / Gemini / Claude / Llama tier); advises executive leadership on AGI safety.",
+          skills: ["Frontier Scaling Laws", "Strategic Compute Allocation", "Next-Gen Paradigm Discovery", "Industry-Wide Technical Authority", "Executive Advisory"],
+          upskillPath: [
+            "Deliver generational model releases that reset global technical benchmarks.",
+            "Attract elite global talent and shape institutional research culture."
+          ]
+        },
+        {
+          code: "R7",
+          name: "Distinguished AI Scientist / VP of AI Research",
+          yoe: "12+ Years",
+          base: { p25: 450000, p50: 550000, p75: 700000, p90: 900000 },
+          bonusPct: 35,
+          equityAnnual: 1100000,
+          scope: "Generational scientific luminary defining the future of artificial intelligence, global frontier compute infrastructure, and corporate AI IP.",
+          skills: ["AGI Strategic Vision", "Global Scientific Direction", "National Compute Advisory", "Transformational Enterprise Impact"],
+          upskillPath: [
+            "Guide planetary-scale AI research destiny and board-level technology investments."
+          ]
+        }
+      ]
     }
   ],
 

@@ -2999,3 +2999,118 @@ input, select, textarea {
   line-height: 1.5;
   margin: 0;
 }
+
+/* ==========================================================================
+   Offer Leverage & Rescission Risk Diagnostic
+   ========================================================================== */
+.leverage-diagnostic-box {
+  background: var(--slate-surface);
+  border: 1px solid var(--slate-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.leverage-diagnostic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.875rem;
+}
+
+.leverage-diagnostic-title {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--navy-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.leverage-badges-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.leverage-score-badge {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--emerald-primary);
+  color: var(--emerald-dark);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.risk-score-badge {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #1D4ED8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+}
+
+.leverage-meter-track {
+  width: 100%;
+  height: 8px;
+  background: #E2E8F0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.leverage-meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #F59E0B 0%, #10B981 100%);
+  border-radius: 4px;
+  transition: width var(--transition-normal);
+}
+
+.leverage-grid-selectors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.leverage-grid-selectors .form-group {
+  margin-bottom: 0;
+}
+
+.leverage-grid-selectors label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--navy-dark);
+  margin-bottom: 0.35rem;
+}
+
+.leverage-grid-selectors select {
+  font-size: 0.8125rem;
+  padding: 0.45rem 0.65rem;
+  background: #FFFFFF;
+}
+
+.leverage-recommendation-box {
+  background: #FFFFFF;
+  border-left: 3px solid var(--emerald-primary);
+  border-radius: 4px;
+  padding: 0.875rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--slate-text);
+  line-height: 1.5;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.leverage-recommendation-box strong {
+  color: var(--navy-dark);
+}
