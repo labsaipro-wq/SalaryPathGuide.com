@@ -3114,3 +3114,109 @@ input, select, textarea {
 .leverage-recommendation-box strong {
   color: var(--navy-dark);
 }
+
+/* ==========================================================================
+   Dual-Offer Showdown Styles (Offer A vs Offer B)
+   ========================================================================== */
+.showdown-inputs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .showdown-inputs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.showdown-offer-box {
+  background: var(--slate-surface);
+  border: 1px solid var(--slate-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+}
+
+.showdown-offer-box.offer-a {
+  border-top: 3px solid var(--navy-dark);
+}
+
+.showdown-offer-box.offer-b {
+  border-top: 3px solid var(--emerald-primary);
+}
+
+.showdown-offer-title {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--navy-dark);
+  margin-bottom: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.showdown-verdict-banner {
+  background: linear-gradient(135deg, var(--navy-dark) 0%, #1E293B 100%);
+  color: #FFFFFF;
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.showdown-verdict-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.showdown-verdict-title {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 0.25rem;
+}
+
+.showdown-verdict-desc {
+  font-size: 0.8125rem;
+  color: #CBD5E1;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.showdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.showdown-table th {
+  background: var(--slate-surface);
+  color: var(--navy-dark);
+  font-weight: 700;
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 2px solid var(--slate-border);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.showdown-table td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--slate-border);
+  color: var(--slate-text);
+}
+
+.showdown-table td.winner-val {
+  font-weight: 800;
+  color: var(--emerald-dark);
+}
+
+.compare-tabs-bar .btn.active {
+  background: var(--navy-dark) !important;
+  color: #FFFFFF !important;
+  border-color: var(--navy-dark) !important;
+}

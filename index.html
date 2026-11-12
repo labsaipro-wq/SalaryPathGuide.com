@@ -161,7 +161,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.0">
+  <link rel="stylesheet" href="styles.css?v=3.1">
   <style>
     .modal-overlay.open,
     .modal-overlay.active {
@@ -859,7 +859,17 @@
                 </div>
               </div>
 
-              <button type="button" id="evalRecalculateBtn" class="btn btn-emerald btn-sm" style="width: 100%;">Evaluate Offer &amp; Generate Script</button>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" id="evalRecalculateBtn" class="btn btn-emerald btn-sm" style="flex: 1;">Evaluate Offer</button>
+                <button type="button" id="evalPrintBtn" class="btn btn-outline-dark btn-sm" style="white-space: nowrap; display: inline-flex; align-items: center; gap: 0.35rem;">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                  </svg>
+                  Print Dossier
+                </button>
+              </div>
             </div>
 
             <!-- Right Results Column -->
@@ -1289,29 +1299,138 @@
     </section>
   </main>
 
-  <!-- Side-by-Side Level Comparison Modal -->
+  <!-- Side-by-Side Level Comparison & Dual-Offer Showdown Modal -->
   <div class="modal-overlay" id="compareModal" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
-    <div class="modal-container">
+    <div class="modal-container" style="max-width: 860px;">
       <div class="modal-header">
-        <h3 class="modal-title" id="compareModalTitle">Compare Job Levels &amp; Compensation Bands</h3>
+        <h3 class="modal-title" id="compareModalTitle">⚖️ Compensation Comparison &amp; Offer Showdown</h3>
         <button class="modal-close-btn" id="compareModalClose" aria-label="Close comparison modal">✕</button>
       </div>
       <div class="modal-body">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
-          <div class="form-group">
-            <label class="form-label">Position A</label>
-            <select id="compareRoleA" class="form-select"></select>
-            <select id="compareLevelA" class="form-select" style="margin-top: 0.5rem;"></select>
+        <!-- Dual Mode Navigation Tabs -->
+        <div class="compare-tabs-bar" style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--slate-border); padding-bottom: 0.5rem;">
+          <button type="button" class="btn btn-outline-dark btn-sm active" id="tabCompareBandsBtn" style="font-weight: 700;">
+            📊 Benchmark Bands (Level A vs B)
+          </button>
+          <button type="button" class="btn btn-outline-dark btn-sm" id="tabCompareOffersBtn" style="font-weight: 700;">
+            ⚔️ Dual-Offer Showdown (Offer A vs Offer B)
+          </button>
+        </div>
+
+        <!-- View 1: Level Bands Comparison -->
+        <div id="compareBandsView">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div class="form-group">
+              <label class="form-label">Position A</label>
+              <select id="compareRoleA" class="form-select"></select>
+              <select id="compareLevelA" class="form-select" style="margin-top: 0.5rem;"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Position B</label>
+              <select id="compareRoleB" class="form-select"></select>
+              <select id="compareLevelB" class="form-select" style="margin-top: 0.5rem;"></select>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Position B</label>
-            <select id="compareRoleB" class="form-select"></select>
-            <select id="compareLevelB" class="form-select" style="margin-top: 0.5rem;"></select>
+
+          <div id="compareResultView" style="display: flex; flex-direction: column; gap: 1rem;">
+            <!-- Populated dynamically -->
           </div>
         </div>
 
-        <div id="compareResultView" style="display: flex; flex-direction: column; gap: 1rem;">
-          <!-- Populated dynamically -->
+        <!-- View 2: Dual-Offer Showdown -->
+        <div id="compareOffersView" style="display: none;">
+          <div class="showdown-inputs-grid">
+            <!-- Offer A Box -->
+            <div class="showdown-offer-box offer-a">
+              <div class="showdown-offer-title">
+                <span>Offer A (Baseline)</span>
+                <span style="font-size: 0.75rem; color: var(--navy-muted); font-weight: 600;">Primary Option</span>
+              </div>
+              <div class="form-group" style="margin-bottom: 0.65rem;">
+                <label class="form-label" for="showdownCompanyA" style="font-size: 0.75rem;">Company</label>
+                <input type="text" id="showdownCompanyA" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;" value="Google">
+              </div>
+              <div class="form-group" style="margin-bottom: 0.65rem;">
+                <label class="form-label" for="showdownLocationA" style="font-size: 0.75rem;">Location &amp; Tax Tier</label>
+                <select id="showdownLocationA" class="form-select" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;">
+                  <option value="9.3" selected>SF Bay Area (CA 9.3% Tax)</option>
+                  <option value="10.9">New York City (NY 10.9% Tax)</option>
+                  <option value="0.0">Seattle / Bellevue (WA 0% Tax)</option>
+                  <option value="0.0">Austin (TX 0% Tax)</option>
+                  <option value="4.4">Denver (CO 4.4% Tax)</option>
+                  <option value="3.5">Remote US (3.5% Avg Tax)</option>
+                </select>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <div class="form-group" style="margin-bottom: 0.65rem;">
+                  <label class="form-label" for="showdownBaseA" style="font-size: 0.75rem;">Base Salary ($)</label>
+                  <input type="number" id="showdownBaseA" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;" value="195000">
+                </div>
+                <div class="form-group" style="margin-bottom: 0.65rem;">
+                  <label class="form-label" for="showdownBonusA" style="font-size: 0.75rem;">Annual Bonus %</label>
+                  <input type="number" id="showdownBonusA" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;" value="15">
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="showdownEquityA" style="font-size: 0.75rem;">4-Yr Equity ($)</label>
+                  <input type="number" id="showdownEquityA" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;" value="300000">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="showdownSignonA" style="font-size: 0.75rem;">Y1 Sign-on ($)</label>
+                  <input type="number" id="showdownSignonA" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;" value="40000">
+                </div>
+              </div>
+            </div>
+
+            <!-- Offer B Box -->
+            <div class="showdown-offer-box offer-b">
+              <div class="showdown-offer-title">
+                <span>Offer B (Challenger)</span>
+                <span style="font-size: 0.75rem; color: var(--emerald-dark); font-weight: 600;">Competing Option</span>
+              </div>
+              <div class="form-group" style="margin-bottom: 0.65rem;">
+                <label class="form-label" for="showdownCompanyB" style="font-size: 0.75rem;">Company</label>
+                <input type="text" id="showdownCompanyB" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;" value="Stripe">
+              </div>
+              <div class="form-group" style="margin-bottom: 0.65rem;">
+                <label class="form-label" for="showdownLocationB" style="font-size: 0.75rem;">Location &amp; Tax Tier</label>
+                <select id="showdownLocationB" class="form-select" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;">
+                  <option value="9.3">SF Bay Area (CA 9.3% Tax)</option>
+                  <option value="10.9">New York City (NY 10.9% Tax)</option>
+                  <option value="0.0" selected>Seattle / Bellevue (WA 0% Tax)</option>
+                  <option value="0.0">Austin (TX 0% Tax)</option>
+                  <option value="4.4">Denver (CO 4.4% Tax)</option>
+                  <option value="3.5">Remote US (3.5% Avg Tax)</option>
+                </select>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <div class="form-group" style="margin-bottom: 0.65rem;">
+                  <label class="form-label" for="showdownBaseB" style="font-size: 0.75rem;">Base Salary ($)</label>
+                  <input type="number" id="showdownBaseB" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;" value="185000">
+                </div>
+                <div class="form-group" style="margin-bottom: 0.65rem;">
+                  <label class="form-label" for="showdownBonusB" style="font-size: 0.75rem;">Annual Bonus %</label>
+                  <input type="number" id="showdownBonusB" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;" value="10">
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="showdownEquityB" style="font-size: 0.75rem;">4-Yr Equity ($)</label>
+                  <input type="number" id="showdownEquityB" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;" value="360000">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label class="form-label" for="showdownSignonB" style="font-size: 0.75rem;">Y1 Sign-on ($)</label>
+                  <input type="number" id="showdownSignonB" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.8125rem;" value="25000">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Showdown Results Container -->
+          <div id="showdownResultsContainer">
+            <!-- Populated dynamically via app.js -->
+          </div>
         </div>
       </div>
     </div>
@@ -1748,7 +1867,7 @@
   </footer>
 
   <!-- App Data and Scripts -->
-  <script src="data/careerData.js?v=3.0"></script>
-  <script src="app.js?v=3.0"></script>
+  <script src="data/careerData.js?v=3.1"></script>
+  <script src="app.js?v=3.1"></script>
 </body>
 </html>

@@ -142,6 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     evalVestingGrid: document.getElementById("evalVestingGrid"),
     counterEmailPre: document.getElementById("counterEmailPre"),
     copyCounterEmailBtn: document.getElementById("copyCounterEmailBtn"),
+    evalPrintBtn: document.getElementById("evalPrintBtn"),
 
     // Offer Leverage Diagnostic Elements
     evalSourceSelect: document.getElementById("evalSourceSelect"),
@@ -177,6 +178,23 @@ document.addEventListener("DOMContentLoaded", () => {
     compareRoleB: document.getElementById("compareRoleB"),
     compareLevelB: document.getElementById("compareLevelB"),
     compareResultView: document.getElementById("compareResultView"),
+    tabCompareBandsBtn: document.getElementById("tabCompareBandsBtn"),
+    tabCompareOffersBtn: document.getElementById("tabCompareOffersBtn"),
+    compareBandsView: document.getElementById("compareBandsView"),
+    compareOffersView: document.getElementById("compareOffersView"),
+    showdownCompanyA: document.getElementById("showdownCompanyA"),
+    showdownLocationA: document.getElementById("showdownLocationA"),
+    showdownBaseA: document.getElementById("showdownBaseA"),
+    showdownBonusA: document.getElementById("showdownBonusA"),
+    showdownEquityA: document.getElementById("showdownEquityA"),
+    showdownSignonA: document.getElementById("showdownSignonA"),
+    showdownCompanyB: document.getElementById("showdownCompanyB"),
+    showdownLocationB: document.getElementById("showdownLocationB"),
+    showdownBaseB: document.getElementById("showdownBaseB"),
+    showdownBonusB: document.getElementById("showdownBonusB"),
+    showdownEquityB: document.getElementById("showdownEquityB"),
+    showdownSignonB: document.getElementById("showdownSignonB"),
+    showdownResultsContainer: document.getElementById("showdownResultsContainer"),
     arbitrageModal: document.getElementById("arbitrageModal"),
     arbitrageModalClose: document.getElementById("arbitrageModalClose"),
     arbOriginCity: document.getElementById("arbOriginCity"),
@@ -1655,7 +1673,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /* ==========================================================================
-     6. Side-by-Side Level Comparison Modal
+     6. Side-by-Side Level Comparison & Dual-Offer Showdown Modal
      ========================================================================== */
   const initCompareModal = () => {
     const populateRoleSelect = (el, defaultVal) => {
@@ -1692,13 +1710,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
     elements.compareLevelB.addEventListener("change", renderComparison);
 
+    // Tab Switching: Bands vs Offers
+    if (elements.tabCompareBandsBtn && elements.tabCompareOffersBtn) {
+      elements.tabCompareBandsBtn.addEventListener("click", () => {
+        elements.tabCompareBandsBtn.classList.add("active");
+        elements.tabCompareOffersBtn.classList.remove("active");
+        if (elements.compareBandsView) elements.compareBandsView.style.display = "block";
+        if (elements.compareOffersView) elements.compareOffersView.style.display = "none";
+        renderComparison();
+      });
+
+      elements.tabCompareOffersBtn.addEventListener("click", () => {
+        elements.tabCompareOffersBtn.classList.add("active");
+        elements.tabCompareBandsBtn.classList.remove("active");
+        if (elements.compareBandsView) elements.compareBandsView.style.display = "none";
+        if (elements.compareOffersView) elements.compareOffersView.style.display = "block";
+        renderShowdown();
+      });
+    }
+
+    // Showdown real-time inputs listener
+    const showdownInputs = [
+      elements.showdownCompanyA, elements.showdownLocationA, elements.showdownBaseA,
+      elements.showdownBonusA, elements.showdownEquityA, elements.showdownSignonA,
+      elements.showdownCompanyB, elements.showdownLocationB, elements.showdownBaseB,
+      elements.showdownBonusB, elements.showdownEquityB, elements.showdownSignonB
+    ];
+    showdownInputs.forEach(input => {
+      if (input) {
+        input.addEventListener("input", renderShowdown);
+        input.addEventListener("change", renderShowdown);
+      }
+    });
+
     const openModal = () => {
-      elements.compareModal.classList.add("open");
-      renderComparison();
+      elements.compareModal.classList.add("open", "active");
+      if (elements.tabCompareOffersBtn && elements.tabCompareOffersBtn.classList.contains("active")) {
+        renderShowdown();
+      } else {
+        renderComparison();
+      }
     };
 
     const closeModal = () => {
-      elements.compareModal.classList.remove("open");
+      elements.compareModal.classList.remove("open", "active");
     };
 
     elements.navCompareBtn.addEventListener("click", openModal);
@@ -1717,6 +1772,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     renderComparison();
+    renderShowdown();
   };
 
   const openCompareModalWithRole = (roleId) => {
@@ -1799,6 +1855,140 @@ document.addEventListener("DOMContentLoaded", () => {
             ${levelB.skills.map(s => `<span class="skill-tag">${escapeHtml(s)}</span>`).join("")}
           </div>
         </div>
+      </div>
+    `;
+  };
+
+  const renderShowdown = () => {
+    if (!elements.showdownResultsContainer) return;
+
+    const companyA = (elements.showdownCompanyA && elements.showdownCompanyA.value.trim()) || "Offer A";
+    const baseA = Number(elements.showdownBaseA && elements.showdownBaseA.value) || 0;
+    const bonusPctA = Number(elements.showdownBonusA && elements.showdownBonusA.value) || 0;
+    const equityA = Number(elements.showdownEquityA && elements.showdownEquityA.value) || 0;
+    const signonA = Number(elements.showdownSignonA && elements.showdownSignonA.value) || 0;
+    const taxRateA = Number(elements.showdownLocationA && elements.showdownLocationA.value) || 0;
+
+    const companyB = (elements.showdownCompanyB && elements.showdownCompanyB.value.trim()) || "Offer B";
+    const baseB = Number(elements.showdownBaseB && elements.showdownBaseB.value) || 0;
+    const bonusPctB = Number(elements.showdownBonusB && elements.showdownBonusB.value) || 0;
+    const equityB = Number(elements.showdownEquityB && elements.showdownEquityB.value) || 0;
+    const signonB = Number(elements.showdownSignonB && elements.showdownSignonB.value) || 0;
+    const taxRateB = Number(elements.showdownLocationB && elements.showdownLocationB.value) || 0;
+
+    // Calculations Offer A
+    const annualBonusA = baseA * (bonusPctA / 100);
+    const annualEquityA = equityA / 4;
+    const y1A = baseA + annualBonusA + annualEquityA + signonA;
+    const y2A = baseA + annualBonusA + annualEquityA;
+    const gross4YrA = y1A + (y2A * 3);
+    const taxDrag4YrA = gross4YrA * (taxRateA / 100);
+    const net4YrA = gross4YrA - taxDrag4YrA;
+
+    // Calculations Offer B
+    const annualBonusB = baseB * (bonusPctB / 100);
+    const annualEquityB = equityB / 4;
+    const y1B = baseB + annualBonusB + annualEquityB + signonB;
+    const y2B = baseB + annualBonusB + annualEquityB;
+    const gross4YrB = y1B + (y2B * 3);
+    const taxDrag4YrB = gross4YrB * (taxRateB / 100);
+    const net4YrB = gross4YrB - taxDrag4YrB;
+
+    const netDelta = net4YrB - net4YrA;
+    const isWinnerB = netDelta >= 0;
+    const winnerCompany = isWinnerB ? companyB : companyA;
+    const loserCompany = isWinnerB ? companyA : companyB;
+    const absNetDelta = Math.abs(netDelta);
+
+    let cliffNote = "";
+    if (signonA > signonB && isWinnerB) {
+      cliffNote = `${companyA} has a -$${Math.round(signonA).toLocaleString()} cliff in Year 2, whereas ${companyB} sustains higher recurring baseline earnings.`;
+    } else if (signonB > signonA && !isWinnerB) {
+      cliffNote = `${companyB} has a -$${Math.round(signonB).toLocaleString()} cliff in Year 2, whereas ${companyA} sustains higher recurring baseline earnings.`;
+    }
+
+    elements.showdownResultsContainer.innerHTML = `
+      <div class="showdown-verdict-banner">
+        <div class="showdown-verdict-icon">🏆</div>
+        <div>
+          <div class="showdown-verdict-title">Showdown Verdict: ${winnerCompany} Leads by +${formatCurrency(absNetDelta)}</div>
+          <p class="showdown-verdict-desc">
+            Over a 4-year horizon, <strong>${winnerCompany}</strong> generates <strong>+${formatCurrency(absNetDelta)}</strong> more in estimated post-tax net wealth compared to ${loserCompany}. ${cliffNote}
+          </p>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--slate-border); border-radius: 8px; overflow-x: auto; background: #FFFFFF; margin-bottom: 1rem;">
+        <table class="showdown-table">
+          <thead>
+            <tr>
+              <th>Metric / Dimension</th>
+              <th>${companyA}</th>
+              <th>${companyB}</th>
+              <th>Comparison Advantage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Base Salary</strong></td>
+              <td class="${baseA >= baseB ? 'winner-val' : ''}">${formatCurrency(baseA)}</td>
+              <td class="${baseB >= baseA ? 'winner-val' : ''}">${formatCurrency(baseB)}</td>
+              <td>${baseB >= baseA ? `+${formatCurrency(baseB - baseA)} (${companyB})` : `+${formatCurrency(baseA - baseB)} (${companyA})`}</td>
+            </tr>
+            <tr>
+              <td><strong>Annual Performance Bonus</strong></td>
+              <td>${bonusPctA}% (${formatCurrency(annualBonusA)})</td>
+              <td>${bonusPctB}% (${formatCurrency(annualBonusB)})</td>
+              <td>${annualBonusB >= annualBonusA ? `+${formatCurrency(annualBonusB - annualBonusA)}` : `+${formatCurrency(annualBonusA - annualBonusB)}`}</td>
+            </tr>
+            <tr>
+              <td><strong>4-Year Equity Grant (Total)</strong></td>
+              <td class="${equityA >= equityB ? 'winner-val' : ''}">${formatCurrency(equityA)}</td>
+              <td class="${equityB >= equityA ? 'winner-val' : ''}">${formatCurrency(equityB)}</td>
+              <td>${equityB >= equityA ? `+${formatCurrency(equityB - equityA)} (${companyB})` : `+${formatCurrency(equityA - equityB)} (${companyA})`}</td>
+            </tr>
+            <tr>
+              <td><strong>Year 1 Cash Signing Bonus</strong></td>
+              <td>${formatCurrency(signonA)}</td>
+              <td>${formatCurrency(signonB)}</td>
+              <td>${signonA !== signonB ? `${signonA > signonB ? companyA : companyB} upfront cliff` : 'Equal'}</td>
+            </tr>
+            <tr style="background: rgba(16, 185, 129, 0.05);">
+              <td><strong>Year 1 Total Comp (Gross)</strong></td>
+              <td class="${y1A >= y1B ? 'winner-val' : ''}"><strong>${formatCurrency(y1A)}</strong></td>
+              <td class="${y1B >= y1A ? 'winner-val' : ''}"><strong>${formatCurrency(y1B)}</strong></td>
+              <td><strong>${y1B >= y1A ? `+${formatCurrency(y1B - y1A)}` : `+${formatCurrency(y1A - y1B)}`}</strong></td>
+            </tr>
+            <tr>
+              <td><strong>Year 2–4 Recurring Comp (Normalized)</strong></td>
+              <td class="${y2A >= y2B ? 'winner-val' : ''}">${formatCurrency(y2A)} / yr</td>
+              <td class="${y2B >= y2A ? 'winner-val' : ''}">${formatCurrency(y2B)} / yr</td>
+              <td>${y2B >= y2A ? `+${formatCurrency(y2B - y2A)} / yr` : `+${formatCurrency(y2A - y2B)} / yr`}</td>
+            </tr>
+            <tr>
+              <td><strong>4-Year Cumulative Gross Comp</strong></td>
+              <td class="${gross4YrA >= gross4YrB ? 'winner-val' : ''}">${formatCurrency(gross4YrA)}</td>
+              <td class="${gross4YrB >= gross4YrA ? 'winner-val' : ''}">${formatCurrency(gross4YrB)}</td>
+              <td>${gross4YrB >= gross4YrA ? `+${formatCurrency(gross4YrB - gross4YrA)}` : `+${formatCurrency(gross4YrA - gross4YrB)}`}</td>
+            </tr>
+            <tr>
+              <td><strong>Est. 4-Year State Tax Drag</strong></td>
+              <td style="color: #DC2626;">-${formatCurrency(taxDrag4YrA)} (${taxRateA}%)</td>
+              <td style="color: #DC2626;">-${formatCurrency(taxDrag4YrB)} (${taxRateB}%)</td>
+              <td style="color: var(--emerald-dark); font-weight: 700;">${taxDrag4YrA > taxDrag4YrB ? `Save +${formatCurrency(taxDrag4YrA - taxDrag4YrB)} in ${companyB}` : `Save +${formatCurrency(taxDrag4YrB - taxDrag4YrA)} in ${companyA}`}</td>
+            </tr>
+            <tr style="background: rgba(10, 17, 40, 0.05); font-weight: 800;">
+              <td><strong>4-Year Net Wealth Surplus (Est.)</strong></td>
+              <td class="${net4YrA >= net4YrB ? 'winner-val' : ''}" style="font-size: 0.9375rem;">${formatCurrency(net4YrA)}</td>
+              <td class="${net4YrB >= net4YrA ? 'winner-val' : ''}" style="font-size: 0.9375rem;">${formatCurrency(net4YrB)}</td>
+              <td style="color: var(--emerald-dark); font-size: 0.9375rem;">+${formatCurrency(absNetDelta)} (${winnerCompany})</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background: var(--slate-surface); border-left: 3px solid var(--emerald-primary); padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.8125rem; color: var(--slate-text); line-height: 1.5;">
+        <strong>Tactical Negotiation Play:</strong> Counter <strong>${loserCompany}</strong> citing ${winnerCompany}'s superior ${equityB > equityA ? 'equity package' : 'take-home wealth'}. Ask ${loserCompany} to match ${winnerCompany}'s numbers to secure your immediate acceptance.
       </div>
     `;
   };
@@ -2090,6 +2280,107 @@ Warm regards,
             showToast("Counter-offer email script copied to clipboard!");
           });
         }
+      });
+    }
+
+    if (elements.evalPrintBtn) {
+      elements.evalPrintBtn.addEventListener("click", () => {
+        const company = (elements.evalCompany.value || "").trim() || "Target Employer";
+        const roleLevel = elements.evalBenchmarkLabel ? elements.evalBenchmarkLabel.textContent : "Software Engineer";
+        const y1 = elements.evalYear1TC ? elements.evalYear1TC.textContent : "$0";
+        const y2 = elements.evalYear2TC ? elements.evalYear2TC.textContent : "$0";
+        const cliff = elements.evalCliffDiff ? elements.evalCliffDiff.textContent : "Stable";
+        const percentile = elements.evalPercentileRank ? elements.evalPercentileRank.textContent : "50th";
+        const leverage = elements.evalLeverageScoreBadge ? elements.evalLeverageScoreBadge.textContent : "Leverage: 80/100";
+        const risk = elements.evalRiskScoreBadge ? elements.evalRiskScoreBadge.textContent : "Risk: Safe";
+        const advice = elements.evalLeverageAdvice ? elements.evalLeverageAdvice.innerHTML : "";
+        const email = elements.counterEmailPre ? elements.counterEmailPre.textContent : "";
+        const vestingHtml = elements.evalVestingGrid ? elements.evalVestingGrid.innerHTML : "";
+
+        const printWindow = window.open("", "_blank", "width=850,height=900");
+        if (!printWindow) {
+          window.print();
+          return;
+        }
+
+        printWindow.document.write(`
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>Executive Job Offer Evaluation Dossier — ${company} — SalaryPathGuide</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0F172A; padding: 2rem; margin: 0; line-height: 1.5; font-size: 10pt; }
+              .header { background: #0A1128 !important; color: #FFFFFF !important; padding: 1.25rem 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .header-badge { font-size: 8pt; font-weight: bold; color: #10B981 !important; text-transform: uppercase; margin-bottom: 0.25rem; }
+              .header-title { font-size: 15pt; font-weight: 800; margin: 0; color: #FFFFFF !important; }
+              .meta-row { display: flex; gap: 1.5rem; font-size: 8.5pt; color: #CBD5E1 !important; margin-top: 0.5rem; }
+              .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+              .kpi-card { border: 1px solid #CBD5E1; background: #F8FAFC !important; border-radius: 6px; padding: 0.85rem; text-align: center; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .kpi-val { font-size: 14pt; font-weight: 800; color: #0A1128; font-family: monospace; }
+              .kpi-label { font-size: 8pt; text-transform: uppercase; color: #64748B; font-weight: 600; margin-top: 0.2rem; }
+              .section-box { border: 1px solid #CBD5E1; border-radius: 6px; padding: 1rem; margin-bottom: 1.25rem; page-break-inside: avoid; }
+              .section-title { font-size: 10.5pt; font-weight: 800; color: #0A1128; margin: 0 0 0.5rem 0; border-bottom: 1px solid #E2E8F0; padding-bottom: 0.35rem; }
+              .vesting-timeline-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+              .vesting-card { background: #F8FAFC !important; border: 1px solid #CBD5E1; padding: 0.5rem; text-align: center; border-radius: 4px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .vesting-year { font-size: 7.5pt; font-weight: bold; color: #64748B; }
+              .vesting-cash { font-size: 9.5pt; font-weight: bold; color: #0A1128; font-family: monospace; }
+              .vesting-equity { font-size: 7.5pt; color: #059669 !important; font-weight: 600; }
+              pre { background: #F8FAFC !important; border: 1px solid #CBD5E1; padding: 0.85rem; border-radius: 4px; font-family: monospace; font-size: 8pt; white-space: pre-wrap; margin: 0; }
+              .footer { text-align: center; font-size: 7.5pt; color: #94A3B8; margin-top: 2rem; border-top: 1px solid #E2E8F0; padding-top: 0.75rem; }
+              @page { margin: 1.2cm; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <div class="header-badge">Confidential Candidate Compensation Intelligence Dossier</div>
+              <h1 class="header-title">${company} Written Offer Analysis</h1>
+              <div class="meta-row">
+                <span><strong>Role / Level:</strong> ${roleLevel}</span>
+                <span><strong>Market Percentile:</strong> ${percentile}</span>
+                <span><strong>Evaluation Date:</strong> ${new Date().toLocaleDateString()}</span>
+              </div>
+            </div>
+
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-val">${y1}</div>
+                <div class="kpi-label">Year 1 Total Comp</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-val">${y2}</div>
+                <div class="kpi-label">Year 2–4 Normalized (${cliff})</div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-val" style="color: #059669;">${leverage}</div>
+                <div class="kpi-label">${risk}</div>
+              </div>
+            </div>
+
+            <div class="section-box">
+              <div class="section-title">4-Year Vesting &amp; Cashflow Schedule</div>
+              <div class="vesting-timeline-grid">${vestingHtml}</div>
+            </div>
+
+            <div class="section-box">
+              <div class="section-title">Negotiation Leverage &amp; Tactical Guidance</div>
+              <div style="font-size: 8.5pt; color: #334155; line-height: 1.5;">${advice}</div>
+            </div>
+
+            <div class="section-box">
+              <div class="section-title">Tailored Counter-Offer Proposal Letter</div>
+              <pre>${email}</pre>
+            </div>
+
+            <div class="footer">
+              &copy; 2026 SalaryPathGuide.com &bull; Certified Compensation Intelligence Engine &bull; Confidential
+            </div>
+            <script>
+              window.onload = function() { window.print(); };
+            <\/script>
+          </body>
+          </html>
+        `);
+        printWindow.document.close();
       });
     }
 
