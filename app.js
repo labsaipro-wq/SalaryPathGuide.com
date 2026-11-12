@@ -1681,9 +1681,15 @@ document.addEventListener("DOMContentLoaded", () => {
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
               Verbatim Phone Dialogue Script
             </div>
-            <button type="button" class="btn btn-outline-dark btn-sm btn-copy-script" data-type="phone">
-              Copy Phone Script
-            </button>
+            <div style="display: flex; gap: 0.45rem; align-items: center;">
+              <button type="button" id="playPhoneScriptBtn" class="btn-audio-speak">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                Listen to Delivery
+              </button>
+              <button type="button" class="btn btn-outline-dark btn-sm btn-copy-script" data-type="phone">
+                Copy Phone Script
+              </button>
+            </div>
           </div>
           <div class="script-content-pre" id="phoneScriptPre">${populatedPhone}</div>
         </div>
@@ -1723,6 +1729,17 @@ document.addEventListener("DOMContentLoaded", () => {
       inp.addEventListener("input", refreshScripts);
     });
 
+    const playPhoneBtn = document.getElementById("playPhoneScriptBtn");
+    if (playPhoneBtn) {
+      playPhoneBtn.addEventListener("click", () => {
+        const el = document.getElementById("phoneScriptPre");
+        if (el) {
+          const plainText = el.innerText || el.textContent;
+          speakText(plainText, playPhoneBtn);
+        }
+      });
+    }
+
     container.querySelectorAll(".btn-copy-script").forEach(btn => {
       btn.addEventListener("click", () => {
         const type = btn.getAttribute("data-type");
@@ -1739,6 +1756,356 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     });
+  };
+
+  /* ==========================================================================
+     Web Speech Audio Coach & Recruiter Objection Roleplay Simulator
+     ========================================================================== */
+  let currentSpeakingBtn = null;
+  const speakText = (rawText, btnEl) => {
+    if (!("speechSynthesis" in window)) {
+      showToast("🔇 Audio playback is not supported in this browser.");
+      return;
+    }
+
+    const wasSameBtn = currentSpeakingBtn === btnEl && window.speechSynthesis.speaking;
+    window.speechSynthesis.cancel();
+
+    document.querySelectorAll(".btn-audio-speak.speaking").forEach(b => {
+      b.classList.remove("speaking");
+      if (b.dataset.defaultHtml) b.innerHTML = b.dataset.defaultHtml;
+    });
+
+    if (wasSameBtn) {
+      currentSpeakingBtn = null;
+      return;
+    }
+
+    const cleanText = rawText.replace(/\s+/g, " ").trim();
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    utterance.rate = 0.96;
+    utterance.pitch = 1.0;
+
+    if (btnEl) {
+      if (!btnEl.dataset.defaultHtml) btnEl.dataset.defaultHtml = btnEl.innerHTML;
+      btnEl.classList.add("speaking");
+      btnEl.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg> Stop Audio`;
+      currentSpeakingBtn = btnEl;
+    }
+
+    const resetBtn = () => {
+      if (btnEl) {
+        btnEl.classList.remove("speaking");
+        if (btnEl.dataset.defaultHtml) btnEl.innerHTML = btnEl.dataset.defaultHtml;
+      }
+      currentSpeakingBtn = null;
+    };
+
+    utterance.onend = resetBtn;
+    utterance.onerror = resetBtn;
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const initRoleplaySimulator = () => {
+    const pillsContainer = document.getElementById("roleplayScenarioPills");
+    const quoteEl = document.getElementById("roleplayRecruiterQuote");
+    const hearRecruiterBtn = document.getElementById("roleplayHearRecruiterBtn");
+    const choicesGrid = document.getElementById("roleplayChoicesGrid");
+    const feedbackPanel = document.getElementById("roleplayFeedbackPanel");
+    const masteryBadge = document.getElementById("roleplayMasteryBadge");
+
+    if (!pillsContainer || !quoteEl || !choicesGrid) return;
+
+    const objections = [
+      {
+        id: "band-ceiling",
+        label: "1. Band Ceiling",
+        recruiterQuote: "We really want you on the team, but we're already at the absolute top of the base salary band for this level. HR simply won't approve a higher base.",
+        choices: [
+          {
+            letter: "A",
+            tier: "weak",
+            score: "35/100 · Premature Concession",
+            text: "Oh, I completely understand. If that's the top of the band, I'll go ahead and sign the offer as-is.",
+            verdict: "You left $20,000–$60,000 in non-base levers on the table.",
+            psychology: "When recruiters cite 'top of the base band', 80% of the time they still have discretionary budget for Sign-On Bonuses, RSU grants, or accelerated 6-month review cycles."
+          },
+          {
+            letter: "B",
+            tier: "mid",
+            score: "62/100 · Rigid Pushback",
+            text: "Are you sure there's no exception? I really need at least $15,000 more in base salary to cover my living expenses.",
+            verdict: "Friction without a constructive path forward.",
+            psychology: "Framing around personal expenses weakens your positioning, and pushing solely on a capped HR base band stalls the recruiter instead of turning them into an ally."
+          },
+          {
+            letter: "C",
+            tier: "elite",
+            score: "98/100 · Elite Total-Comp Pivot",
+            text: "I completely respect internal base bands. If base is capped at this level, let's look at bridging the total compensation gap through an increased 4-year RSU grant or an additional sign-on bonus so we can hit our target number and I can sign right away.",
+            verdict: "Masterclass Pivot — Collaborative, Data-Driven & Actionable!",
+            psychology: "You validated the recruiter's constraint while immediately pivoting to flexible comp buckets (RSUs & Sign-On) that Compensation Committees routinely approve without breaking level parity."
+          }
+        ]
+      },
+      {
+        id: "exploding-deadline",
+        label: "2. Exploding Deadline",
+        recruiterQuote: "The hiring manager needs your signed acceptance by Friday at 5 PM, otherwise we have to extend the offer to another finalist.",
+        choices: [
+          {
+            letter: "A",
+            tier: "weak",
+            score: "25/100 · Pressure Collapse",
+            text: "Okay, I don't want to lose the role—I'll cancel my remaining final-round interviews and sign by Friday.",
+            verdict: "You surrendered your single greatest source of leverage.",
+            psychology: "Artificial deadlines are designed to prevent competing offers from materializing. Canceling final rounds eliminates your BATNA (Best Alternative to a Negotiated Agreement)."
+          },
+          {
+            letter: "B",
+            tier: "mid",
+            score: "60/100 · Unanchored Delay",
+            text: "Friday is really tight for me. Can you please give me two more weeks to think it over?",
+            verdict: "Too vague and too long; triggers flight-risk alarms.",
+            psychology: "Asking for 2 full weeks without a clear milestone makes hiring managers assume you're stalling or waiting for something unlikely."
+          },
+          {
+            letter: "C",
+            tier: "elite",
+            score: "97/100 · High-Conviction Extension",
+            text: "I'm genuinely excited about the team and want to make a well-informed, long-term commitment. Because I'm wrapping up final conversations early next week, could we extend the deadline to Wednesday? Having those extra 3 business days ensures I can sign with 100% conviction.",
+            verdict: "Optimal Framing — Flips Scarcity into Mutual Certainty!",
+            psychology: "Recruiters rarely pull offers from their #1 finalist over 3 business days. Signaling active late-stage pipelines also subtly boosts your market value."
+          }
+        ]
+      },
+      {
+        id: "competing-pushback",
+        label: "3. Competing Offer",
+        recruiterQuote: "We reviewed your competing offer, but we're a stronger long-term brand with higher equity upside—we don't match other companies dollar-for-dollar.",
+        choices: [
+          {
+            letter: "A",
+            tier: "weak",
+            score: "30/100 · Value Surrender",
+            text: "That makes sense, your stock upside is probably worth more in the long run anyway.",
+            verdict: "Accepted speculative upside in place of guaranteed cash.",
+            psychology: "Companies love selling 'long-term upside' because it costs them zero guaranteed budget today."
+          },
+          {
+            letter: "B",
+            tier: "mid",
+            score: "55/100 · Ultimatum Trap",
+            text: "Their cash is guaranteed, so unless you match their exact dollar figure, I'm going to decline.",
+            verdict: "High rescission/stalemate risk due to adversarial ultimatum.",
+            psychology: "Hard ultimatums force recruiters into a defensive corner rather than problem-solving with you."
+          },
+          {
+            letter: "C",
+            tier: "elite",
+            score: "99/100 · Collaborative Gap-Bridge",
+            text: "I definitely value the long-term equity upside here, which is why you're my top choice. At the same time, the competing offer creates a $35,000 guaranteed Year 1 cash gap. If we can bridge even half of that gap via a sign-on bonus or equity bump, it makes my decision easy.",
+            verdict: "Executive Close — Separates Preference from Math!",
+            psychology: "Reaffirming them as your #1 choice removes ego friction, while asking to 'meet in the middle' gives the Compensation Committee an easy, face-saving win."
+          }
+        ]
+      },
+      {
+        id: "verbal-promise",
+        label: "4. Verbal Promise",
+        recruiterQuote: "Don't worry about the Year 2 dip after your sign-on rolls off—high performers here always get huge equity refreshers and an early promotion review at 6 months.",
+        choices: [
+          {
+            letter: "A",
+            tier: "weak",
+            score: "20/100 · Unwritten Risk",
+            text: "That sounds reassuring! Thanks for sharing how refreshers work—I trust the process.",
+            verdict: "Exposed yourself to a guaranteed Year 2 compensation cliff.",
+            psychology: "Managers change, budgets freeze, and verbal expectations are never legally or HR-binding. If it's not in the written offer letter, it doesn't exist."
+          },
+          {
+            letter: "B",
+            tier: "mid",
+            score: "58/100 · Cynical Tone",
+            text: "I don't really trust verbal promises unless they're written in a contract.",
+            verdict: "Right instinct, wrong tone—damages rapport.",
+            psychology: "Implying the recruiter or manager is untrustworthy creates unnecessary interpersonal friction."
+          },
+          {
+            letter: "C",
+            tier: "elite",
+            score: "98/100 · Contractual Memorialization",
+            text: "That's great to hear about the performance culture! Since verbal expectations aren't always carried over if org structures shift, could we memorialize a guaranteed 6-month compensation review checkpoint—or add a Year 2 retention refresher—directly in the written offer letter?",
+            verdict: "Institutional Protection — Polite, Objective & Bulletproof!",
+            psychology: "Blaming 'organizational shifts' instead of people keeps everyone on the same side while ensuring your Year 2 total comp is protected in writing."
+          }
+        ]
+      },
+      {
+        id: "salary-trap",
+        label: "5. Early Salary Trap",
+        recruiterQuote: "Before we move you to the hiring manager interview, what is your current compensation and what are your exact salary expectations?",
+        choices: [
+          {
+            letter: "A",
+            tier: "weak",
+            score: "15/100 · Anchored Low",
+            text: "I currently make $135,000, and I'd be happy with $145,000.",
+            verdict: "You just capped your own offer potentially $50k+ below market.",
+            psychology: "Revealing current pay anchors the company to your past salary rather than the market value of the new role (and is even illegal for employers to require in many states)."
+          },
+          {
+            letter: "B",
+            tier: "mid",
+            score: "65/100 · Awkward Deflection",
+            text: "I'm not comfortable sharing my numbers right now. Can you tell me what the range is first?",
+            verdict: "Safe from anchoring low, but slightly defensive.",
+            psychology: "Good to ask for the band, though pairing it with an assertive market benchmark sounds far more senior."
+          },
+          {
+            letter: "C",
+            tier: "elite",
+            score: "96/100 · P75 Market Anchor Flip",
+            text: "I'm focused on finding the right scope and impact first. Based on 2026 market benchmarks for this level and my experience, I'm targeting total compensation in the P75 range—around $240k to $270k depending on the equity and bonus structure. Does that align with your budgeted band for this role?",
+            verdict: "Senior Positioning — Anchors High & Qualifies Budget Early!",
+            psychology: "You bypassed current compensation completely, anchored to P75 external market data, and prompted the recruiter to confirm the role's true ceiling."
+          }
+        ]
+      }
+    ];
+
+    let activeIdx = 0;
+    const clearedIds = new Set();
+
+    const updateMasteryBadge = () => {
+      if (masteryBadge) {
+        masteryBadge.textContent = `Readiness: ${clearedIds.size} / ${objections.length} Objections Cleared`;
+      }
+    };
+
+    const renderScenario = (idx) => {
+      activeIdx = idx;
+      const item = objections[idx];
+      if (!item) return;
+
+      // Render pills
+      pillsContainer.innerHTML = objections.map((obj, i) => {
+        const isActive = i === idx ? "active" : "";
+        const isCleared = clearedIds.has(obj.id) ? "cleared" : "";
+        const check = clearedIds.has(obj.id) ? "✓ " : "";
+        return `<button type="button" class="roleplay-pill-btn ${isActive} ${isCleared}" data-idx="${i}">${check}${obj.label}</button>`;
+      }).join("");
+
+      pillsContainer.querySelectorAll(".roleplay-pill-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          window.speechSynthesis && window.speechSynthesis.cancel();
+          renderScenario(Number(btn.getAttribute("data-idx")));
+        });
+      });
+
+      // Render recruiter quote
+      quoteEl.textContent = `"${item.recruiterQuote}"`;
+      if (hearRecruiterBtn) {
+        hearRecruiterBtn.classList.remove("speaking");
+        hearRecruiterBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Hear Recruiter Audio`;
+        hearRecruiterBtn.dataset.defaultHtml = hearRecruiterBtn.innerHTML;
+      }
+
+      // Hide previous feedback
+      if (feedbackPanel) feedbackPanel.style.display = "none";
+
+      // Render choices
+      choicesGrid.innerHTML = item.choices.map((c, cIdx) => `
+        <button type="button" class="roleplay-choice-btn" data-choice-idx="${cIdx}">
+          <span class="roleplay-choice-letter">${c.letter}</span>
+          <span class="roleplay-choice-text">"${escapeHtml(c.text)}"</span>
+        </button>
+      `).join("");
+
+      choicesGrid.querySelectorAll(".roleplay-choice-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const cIdx = Number(btn.getAttribute("data-choice-idx"));
+          const chosen = item.choices[cIdx];
+
+          // Clear previous choice states
+          choicesGrid.querySelectorAll(".roleplay-choice-btn").forEach(b => {
+            b.classList.remove("selected-elite", "selected-mid", "selected-weak");
+          });
+          btn.classList.add(`selected-${chosen.tier}`);
+
+          if (chosen.tier === "elite") {
+            clearedIds.add(item.id);
+            updateMasteryBadge();
+            // Refresh pills to show checkmark
+            pillsContainer.querySelectorAll(".roleplay-pill-btn").forEach((pBtn, pI) => {
+              if (clearedIds.has(objections[pI].id)) {
+                pBtn.classList.add("cleared");
+                if (!pBtn.textContent.startsWith("✓")) {
+                  pBtn.textContent = "✓ " + objections[pI].label;
+                }
+              }
+            });
+          }
+
+          // Find elite choice for playback/copy
+          const eliteChoice = item.choices.find(c => c.tier === "elite") || chosen;
+
+          if (feedbackPanel) {
+            feedbackPanel.className = `roleplay-feedback-panel tier-${chosen.tier}`;
+            feedbackPanel.style.display = "block";
+            feedbackPanel.innerHTML = `
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <strong style="font-size: 0.9375rem; color: var(--navy-dark);">${chosen.score}</strong>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button type="button" id="roleplayHearOptimalBtn" class="btn-audio-speak">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    Hear Optimal Delivery
+                  </button>
+                  <button type="button" id="roleplayCopyOptimalBtn" class="btn btn-outline-dark btn-sm" style="font-size: 0.75rem; padding: 0.3rem 0.65rem;">
+                    Copy Optimal Response
+                  </button>
+                </div>
+              </div>
+              <div style="font-weight: 700; font-size: 0.875rem; margin-bottom: 0.35rem; color: ${chosen.tier === "elite" ? "var(--emerald-dark)" : (chosen.tier === "mid" ? "#B45309" : "#DC2626")};">
+                ${chosen.verdict}
+              </div>
+              <p style="font-size: 0.875rem; color: var(--slate-text); line-height: 1.5; margin: 0;">
+                <strong>Recruiter Psychology:</strong> ${chosen.psychology}
+              </p>
+            `;
+
+            const hearOptBtn = document.getElementById("roleplayHearOptimalBtn");
+            if (hearOptBtn) {
+              hearOptBtn.addEventListener("click", () => {
+                speakText(eliteChoice.text, hearOptBtn);
+              });
+            }
+
+            const copyOptBtn = document.getElementById("roleplayCopyOptimalBtn");
+            if (copyOptBtn) {
+              copyOptBtn.addEventListener("click", () => {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                  navigator.clipboard.writeText(eliteChoice.text).then(() => {
+                    showToast("📋 Optimal counter-response copied to clipboard!");
+                  });
+                }
+              });
+            }
+          }
+        });
+      });
+    };
+
+    if (hearRecruiterBtn) {
+      hearRecruiterBtn.addEventListener("click", () => {
+        const item = objections[activeIdx];
+        if (item) speakText(item.recruiterQuote, hearRecruiterBtn);
+      });
+    }
+
+    renderScenario(0);
+    updateMasteryBadge();
   };
 
   const populateScript = (template) => {
@@ -3441,6 +3808,7 @@ Warm regards,
   initLeadMagnet();
   initDirectory();
   initNegotiationPlaybook();
+  initRoleplaySimulator();
   initResources();
   initCompareModal();
   initNavigation();
