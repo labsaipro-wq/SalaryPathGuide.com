@@ -246,8 +246,31 @@ document.addEventListener("DOMContentLoaded", () => {
     subSignon: document.getElementById("subSignon"),
     subNotes: document.getElementById("subNotes"),
 
-    // Share Trajectory Button
+    // Share Trajectory & Scenario Elements
     shareTrajectoryBtn: document.getElementById("shareTrajectoryBtn"),
+    evalShareBtn: document.getElementById("evalShareBtn"),
+    shareModal: document.getElementById("shareModal"),
+    shareModalTitle: document.getElementById("shareModalTitle"),
+    shareModalClose: document.getElementById("shareModalClose"),
+    shareUrlInput: document.getElementById("shareUrlInput"),
+    copyShareUrlBtn: document.getElementById("copyShareUrlBtn"),
+    copyShareBtnText: document.getElementById("copyShareBtnText"),
+    shareSnapshotRole: document.getElementById("shareSnapshotRole"),
+    shareSnapshotBadge: document.getElementById("shareSnapshotBadge"),
+    shareSnapshotStartBase: document.getElementById("shareSnapshotStartBase"),
+    shareSnapshotTotal: document.getElementById("shareSnapshotTotal"),
+    shareSnapshotWealth: document.getElementById("shareSnapshotWealth"),
+    shareTwitterBtn: document.getElementById("shareTwitterBtn"),
+    shareLinkedInBtn: document.getElementById("shareLinkedInBtn"),
+    shareEmailBtn: document.getElementById("shareEmailBtn"),
+    shareTextSummaryBtn: document.getElementById("shareTextSummaryBtn"),
+
+    // Shared Scenario Banner Elements
+    sharedScenarioBanner: document.getElementById("sharedScenarioBanner"),
+    sharedBannerTitle: document.getElementById("sharedBannerTitle"),
+    sharedBannerSubtitle: document.getElementById("sharedBannerSubtitle"),
+    sharedBannerResetBtn: document.getElementById("sharedBannerResetBtn"),
+    sharedBannerCloseBtn: document.getElementById("sharedBannerCloseBtn"),
 
     // Equity Vesting Simulator Elements
     equityToggleBtn: document.getElementById("equityToggleBtn"),
@@ -690,6 +713,13 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    // Share Evaluated Offer Button
+    if (elements.evalShareBtn) {
+      elements.evalShareBtn.addEventListener("click", () => {
+        shareOfferEvaluationLink();
+      });
+    }
+
     // Equity Vesting & Refresher Simulator Setup
     if (elements.equityToggleBtn) {
       elements.equityToggleBtn.addEventListener("click", () => {
@@ -1004,6 +1034,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Render / Update Chart
     renderTrajectoryChart(yearData);
+
+    // Debounced URL state sync for seamless deep-linking
+    if (typeof syncUrlStateDebounced === "function") {
+      syncUrlStateDebounced();
+    }
   };
 
   const renderProgressionTable = (yearData) => {
@@ -2809,7 +2844,42 @@ Warm regards,
   /* ==========================================================================
      Share Trajectory & URL State Loader (Viral Loop)
      ========================================================================== */
-  const shareTrajectoryLink = () => {
+  let urlSyncTimeout = null;
+  const syncUrlStateDebounced = () => {
+    if (urlSyncTimeout) clearTimeout(urlSyncTimeout);
+    urlSyncTimeout = setTimeout(() => {
+      const params = new URLSearchParams();
+      params.set("r", state.selectedRoleId);
+      params.set("b", Math.round(state.currentBaseSalary));
+      params.set("raise", state.annualRaisePct);
+      params.set("promo", state.promoInterval);
+      params.set("bump", state.promoBumpPct);
+      params.set("bonus", state.bonusPct);
+      params.set("loc", state.calcLocationMultiplier);
+      if (state.adjustForInflation) params.set("inf", "1");
+      if (state.taxMode === "net") params.set("tax", "net");
+      if (state.enableHousehold) {
+        params.set("hh", "1");
+        params.set("pr", state.partnerRoleId);
+        params.set("pb", Math.round(state.partnerBaseSalary));
+        params.set("pra", state.partnerRaisePct);
+      }
+      if (state.enableEquity) {
+        params.set("eq", "1");
+        params.set("eg", Math.round(state.equityInitialGrant));
+        params.set("vs", state.equityVestingSchedule);
+        params.set("er", Math.round(state.equityRefresherGrant));
+      }
+      params.set("sav", state.wealthSavingsRate || 35);
+      params.set("ret", state.wealthReturnRate || 0.075);
+      params.set("port", Math.round(state.wealthStartingNetWorth || 50000));
+
+      const newUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}${window.location.hash || ""}`;
+      window.history.replaceState({}, "", newUrl);
+    }, 400);
+  };
+
+  const getTrajectoryShareUrl = () => {
     const params = new URLSearchParams();
     params.set("r", state.selectedRoleId);
     params.set("b", Math.round(state.currentBaseSalary));
@@ -2832,18 +2902,149 @@ Warm regards,
       params.set("vs", state.equityVestingSchedule);
       params.set("er", Math.round(state.equityRefresherGrant));
     }
+    params.set("sav", state.wealthSavingsRate || 35);
+    params.set("ret", state.wealthReturnRate || 0.075);
+    params.set("port", Math.round(state.wealthStartingNetWorth || 50000));
+    return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+  };
 
-    const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+  const shareTrajectoryLink = () => {
+    const shareUrl = getTrajectoryShareUrl();
     window.history.replaceState({}, "", shareUrl);
+
+    const role = roles.find(r => r.id === state.selectedRoleId) || roles[0];
+    if (elements.shareModalTitle) {
+      elements.shareModalTitle.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+        Share Customized Compensation Scenario
+      `;
+    }
+    if (elements.shareUrlInput) elements.shareUrlInput.value = shareUrl;
+    if (elements.shareSnapshotRole) elements.shareSnapshotRole.textContent = `${role.title} (${role.category})`;
+    if (elements.shareSnapshotBadge) {
+      elements.shareSnapshotBadge.textContent = `${state.adjustForInflation ? "Real" : "Nominal"} · ${state.taxMode === "net" ? "Net" : "Gross"} · ${state.enableHousehold ? "Household" : (state.enableEquity ? "With Equity" : "Cash Only")}`;
+    }
+    if (elements.shareSnapshotStartBase) elements.shareSnapshotStartBase.textContent = formatCurrency(state.currentBaseSalary);
+    if (elements.shareSnapshotTotal) elements.shareSnapshotTotal.textContent = elements.kpiTotalEarnings ? elements.kpiTotalEarnings.textContent : "$0";
+    if (elements.shareSnapshotWealth) elements.shareSnapshotWealth.textContent = elements.wealthY5Invested ? elements.wealthY5Invested.textContent : "$0";
+
+    if (elements.shareModal) elements.shareModal.classList.add("open", "active");
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(shareUrl).then(() => {
         showToast("🔗 Custom trajectory link copied to clipboard!");
-      }).catch(() => {
-        prompt("Copy this customized trajectory link:", shareUrl);
+      }).catch(() => {});
+    }
+  };
+
+  const shareOfferEvaluationLink = () => {
+    const params = new URLSearchParams();
+    if (elements.evalRoleSelect) params.set("erole", elements.evalRoleSelect.value);
+    if (elements.evalCompany) params.set("ecomp", elements.evalCompany.value);
+    if (elements.evalBaseSalary) params.set("ebase", elements.evalBaseSalary.value);
+    if (elements.evalBonusPct) params.set("ebonus", elements.evalBonusPct.value);
+    if (elements.evalEquityTotal) params.set("eequity", elements.evalEquityTotal.value);
+    if (elements.evalSignonBonus) params.set("esignon", elements.evalSignonBonus.value);
+    if (elements.evalCompetingOffer) params.set("ecompete", elements.evalCompetingOffer.value);
+
+    const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}#offer-evaluator`;
+    window.history.replaceState({}, "", shareUrl);
+
+    if (elements.shareModalTitle) {
+      elements.shareModalTitle.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"></circle>
+          <circle cx="6" cy="12" r="3"></circle>
+          <circle cx="18" cy="19" r="3"></circle>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+        </svg>
+        Share Evaluated Job Offer
+      `;
+    }
+    if (elements.shareUrlInput) elements.shareUrlInput.value = shareUrl;
+    if (elements.shareSnapshotRole) elements.shareSnapshotRole.textContent = `${elements.evalCompany && elements.evalCompany.value ? elements.evalCompany.value : "Tech"} Offer Evaluation`;
+    if (elements.shareSnapshotBadge) elements.shareSnapshotBadge.textContent = elements.evalPercentileRank ? elements.evalPercentileRank.textContent : "Evaluated Offer";
+    if (elements.shareSnapshotStartBase) elements.shareSnapshotStartBase.textContent = formatCurrency(Number(elements.evalBaseSalary ? elements.evalBaseSalary.value : 0) || 0);
+    if (elements.shareSnapshotTotal) elements.shareSnapshotTotal.textContent = elements.evalYear1TC ? elements.evalYear1TC.textContent : "$0";
+    if (elements.shareSnapshotWealth) elements.shareSnapshotWealth.textContent = elements.evalYear2TC ? elements.evalYear2TC.textContent : "$0";
+
+    if (elements.shareModal) elements.shareModal.classList.add("open", "active");
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast("🔗 Offer evaluation link copied to clipboard!");
+      }).catch(() => {});
+    }
+  };
+
+  const initShareModalListeners = () => {
+    if (elements.shareModalClose && elements.shareModal) {
+      elements.shareModalClose.addEventListener("click", () => {
+        elements.shareModal.classList.remove("open", "active");
       });
-    } else {
-      prompt("Copy this customized trajectory link:", shareUrl);
+      elements.shareModal.addEventListener("click", (e) => {
+        if (e.target === elements.shareModal) {
+          elements.shareModal.classList.remove("open", "active");
+        }
+      });
+    }
+
+    if (elements.copyShareUrlBtn && elements.shareUrlInput) {
+      elements.copyShareUrlBtn.addEventListener("click", () => {
+        const url = elements.shareUrlInput.value;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(() => {
+            if (elements.copyShareBtnText) elements.copyShareBtnText.textContent = "Copied! ✓";
+            showToast("🔗 Direct scenario link copied to clipboard!");
+            setTimeout(() => {
+              if (elements.copyShareBtnText) elements.copyShareBtnText.textContent = "Copy Link";
+            }, 2000);
+          });
+        } else {
+          elements.shareUrlInput.select();
+          document.execCommand("copy");
+          showToast("🔗 Direct scenario link copied to clipboard!");
+        }
+      });
+    }
+
+    if (elements.shareTwitterBtn) {
+      elements.shareTwitterBtn.addEventListener("click", () => {
+        const url = elements.shareUrlInput ? elements.shareUrlInput.value : window.location.href;
+        const role = roles.find(r => r.id === state.selectedRoleId) || roles[0];
+        const text = `I just modeled a 5-year compensation trajectory & FIRE horizon for a ${role.title} on @SalaryPathGuide! Check out the scenario:`;
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, "_blank", "width=600,height=400");
+      });
+    }
+
+    if (elements.shareLinkedInBtn) {
+      elements.shareLinkedInBtn.addEventListener("click", () => {
+        const url = elements.shareUrlInput ? elements.shareUrlInput.value : window.location.href;
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, "_blank", "width=600,height=500");
+      });
+    }
+
+    if (elements.shareEmailBtn) {
+      elements.shareEmailBtn.addEventListener("click", () => {
+        const url = elements.shareUrlInput ? elements.shareUrlInput.value : window.location.href;
+        const role = roles.find(r => r.id === state.selectedRoleId) || roles[0];
+        const subject = `5-Year Compensation & Wealth Trajectory: ${role.title}`;
+        const body = `Hi,\n\nI created a customized 5-year career compensation and FIRE milestone model on SalaryPathGuide:\n\nRole: ${role.title}\nStarting Base: ${formatCurrency(state.currentBaseSalary)}\n5-Year Projected Total Comp: ${elements.kpiTotalEarnings ? elements.kpiTotalEarnings.textContent : ""}\n5-Year Projected Invested Wealth: ${elements.wealthY5Invested ? elements.wealthY5Invested.textContent : ""}\n\nView the full interactive scenario and math here:\n${url}\n`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      });
+    }
+
+    if (elements.shareTextSummaryBtn) {
+      elements.shareTextSummaryBtn.addEventListener("click", () => {
+        copyTrajectorySummaryToClipboard();
+      });
     }
   };
 
@@ -2851,16 +3052,24 @@ Warm regards,
     const params = new URLSearchParams(window.location.search);
     if (!params.toString()) return;
 
+    let isCustomTrajectory = false;
+
     if (params.has("r")) {
       const r = params.get("r");
       if (roles.some(role => role.id === r)) {
         state.selectedRoleId = r;
         if (elements.calcJobTitle) elements.calcJobTitle.value = r;
+        const roleObj = roles.find(ro => ro.id === r);
+        if (roleObj && elements.calcTrackBadge) elements.calcTrackBadge.textContent = roleObj.category;
+        isCustomTrajectory = true;
       }
     }
     if (params.has("b")) {
       const b = Number(params.get("b"));
-      if (!isNaN(b) && b > 0) updateBaseSalary(b);
+      if (!isNaN(b) && b > 0) {
+        updateBaseSalary(b);
+        isCustomTrajectory = true;
+      }
     }
     if (params.has("raise")) {
       const val = Number(params.get("raise"));
@@ -2868,6 +3077,7 @@ Warm regards,
         state.annualRaisePct = val;
         if (elements.calcAnnualRaise) elements.calcAnnualRaise.value = val;
         if (elements.calcRaiseBadge) elements.calcRaiseBadge.textContent = `${val.toFixed(1)}%`;
+        isCustomTrajectory = true;
       }
     }
     if (params.has("promo")) {
@@ -2875,6 +3085,9 @@ Warm regards,
       if (!isNaN(val)) {
         state.promoInterval = val;
         if (elements.calcPromoInterval) elements.calcPromoInterval.value = val;
+        const textMap = { 1: "Every 1 Year", 2: "Every 2 Years", 3: "Every 3 Years", 0: "None" };
+        if (elements.calcPromoBadge) elements.calcPromoBadge.textContent = textMap[val] || "Custom";
+        isCustomTrajectory = true;
       }
     }
     if (params.has("bump")) {
@@ -2883,6 +3096,7 @@ Warm regards,
         state.promoBumpPct = val;
         if (elements.calcPromoBump) elements.calcPromoBump.value = val;
         if (elements.calcBumpBadge) elements.calcBumpBadge.textContent = `${val}%`;
+        isCustomTrajectory = true;
       }
     }
     if (params.has("bonus")) {
@@ -2891,6 +3105,7 @@ Warm regards,
         state.bonusPct = val;
         if (elements.calcBonusPct) elements.calcBonusPct.value = val;
         if (elements.calcBonusBadge) elements.calcBonusBadge.textContent = `${val}%`;
+        isCustomTrajectory = true;
       }
     }
     if (params.has("loc")) {
@@ -2898,11 +3113,13 @@ Warm regards,
       if (!isNaN(val)) {
         state.calcLocationMultiplier = val;
         if (elements.calcLocationTier) elements.calcLocationTier.value = val.toString();
+        isCustomTrajectory = true;
       }
     }
     if (params.has("inf")) {
-      state.adjustForInflation = true;
-      if (elements.calcInflationToggle) elements.calcInflationToggle.checked = true;
+      state.adjustForInflation = params.get("inf") === "1";
+      if (elements.calcInflationToggle) elements.calcInflationToggle.checked = state.adjustForInflation;
+      isCustomTrajectory = true;
     }
     if (params.has("tax") && params.get("tax") === "net") {
       state.taxMode = "net";
@@ -2911,12 +3128,13 @@ Warm regards,
           b.classList.toggle("active", b.getAttribute("data-mode") === "net");
         });
       }
+      isCustomTrajectory = true;
     }
     if (params.has("hh")) {
-      state.enableHousehold = true;
-      if (elements.enableHouseholdToggle) elements.enableHouseholdToggle.checked = true;
-      if (elements.householdInputsWrap) elements.householdInputsWrap.style.display = "flex";
-      if (elements.householdOptionsPanel) elements.householdOptionsPanel.style.display = "block";
+      state.enableHousehold = params.get("hh") === "1";
+      if (elements.enableHouseholdToggle) elements.enableHouseholdToggle.checked = state.enableHousehold;
+      if (elements.householdInputsWrap) elements.householdInputsWrap.style.display = state.enableHousehold ? "flex" : "none";
+      if (elements.householdOptionsPanel) elements.householdOptionsPanel.style.display = state.enableHousehold ? "block" : "none";
       if (params.has("pr")) state.partnerRoleId = params.get("pr");
       if (params.has("pb")) {
         state.partnerBaseSalary = Number(params.get("pb")) || 120000;
@@ -2928,12 +3146,13 @@ Warm regards,
         if (elements.partnerRaise) elements.partnerRaise.value = state.partnerRaisePct;
         if (elements.partnerRaiseBadge) elements.partnerRaiseBadge.textContent = `${state.partnerRaisePct.toFixed(1)}%`;
       }
+      isCustomTrajectory = true;
     }
     if (params.has("eq")) {
-      state.enableEquity = true;
-      if (elements.enableEquityToggle) elements.enableEquityToggle.checked = true;
-      if (elements.equityInputsWrap) elements.equityInputsWrap.style.display = "flex";
-      if (elements.equityOptionsPanel) elements.equityOptionsPanel.style.display = "block";
+      state.enableEquity = params.get("eq") === "1";
+      if (elements.enableEquityToggle) elements.enableEquityToggle.checked = state.enableEquity;
+      if (elements.equityInputsWrap) elements.equityInputsWrap.style.display = state.enableEquity ? "flex" : "none";
+      if (elements.equityOptionsPanel) elements.equityOptionsPanel.style.display = state.enableEquity ? "block" : "none";
       if (params.has("eg")) {
         state.equityInitialGrant = Number(params.get("eg")) || 160000;
         if (elements.equityInitialGrant) elements.equityInitialGrant.value = state.equityInitialGrant;
@@ -2948,10 +3167,83 @@ Warm regards,
         if (elements.equityRefresherGrant) elements.equityRefresherGrant.value = state.equityRefresherGrant;
         if (elements.equityRefresherBadge) elements.equityRefresherBadge.textContent = `${formatCurrency(state.equityRefresherGrant)} / yr`;
       }
+      isCustomTrajectory = true;
+    }
+
+    // Wealth & FIRE Projector URL Parameters
+    if (params.has("sav")) {
+      const val = Number(params.get("sav"));
+      if (!isNaN(val) && val >= 10 && val <= 75) {
+        state.wealthSavingsRate = val;
+        if (elements.wealthSavingsRate) elements.wealthSavingsRate.value = val;
+        if (elements.wealthSavingsBadge) elements.wealthSavingsBadge.textContent = `${val}%`;
+        isCustomTrajectory = true;
+      }
+    }
+    if (params.has("ret")) {
+      const val = Number(params.get("ret"));
+      if (!isNaN(val)) {
+        state.wealthReturnRate = val;
+        if (elements.wealthReturnRate) elements.wealthReturnRate.value = val.toString();
+        isCustomTrajectory = true;
+      }
+    }
+    if (params.has("port")) {
+      const val = Number(params.get("port"));
+      if (!isNaN(val) && val >= 0) {
+        state.wealthStartingNetWorth = val;
+        if (elements.wealthStartingNetWorth) elements.wealthStartingNetWorth.value = val;
+        isCustomTrajectory = true;
+      }
+    }
+
+    // Offer Evaluator URL Parameters
+    if (params.has("erole") || params.has("ebase")) {
+      if (params.has("erole") && elements.evalRoleSelect) elements.evalRoleSelect.value = params.get("erole");
+      if (params.has("ecomp") && elements.evalCompany) elements.evalCompany.value = params.get("ecomp");
+      if (params.has("ebase") && elements.evalBaseSalary) elements.evalBaseSalary.value = params.get("ebase");
+      if (params.has("ebonus") && elements.evalBonusPct) elements.evalBonusPct.value = params.get("ebonus");
+      if (params.has("eequity") && elements.evalEquityTotal) elements.evalEquityTotal.value = params.get("eequity");
+      if (params.has("esignon") && elements.evalSignonBonus) elements.evalSignonBonus.value = params.get("esignon");
+      if (params.has("ecompete") && elements.evalCompetingOffer) elements.evalCompetingOffer.value = params.get("ecompete");
+      if (typeof evaluateOffer === "function") evaluateOffer();
+      if (window.location.hash === "#offer-evaluator") {
+        setTimeout(() => {
+          const evalSec = document.getElementById("offer-evaluator");
+          if (evalSec) evalSec.scrollIntoView({ behavior: "smooth" });
+        }, 300);
+      }
     }
 
     runTrajectoryCalculations();
-    showToast("✨ Loaded custom shared trajectory!");
+
+    // Show Shared Scenario Banner if customized trajectory params present
+    if (isCustomTrajectory && elements.sharedScenarioBanner) {
+      elements.sharedScenarioBanner.style.display = "flex";
+      const roleObj = roles.find(r => r.id === state.selectedRoleId) || roles[0];
+      if (elements.sharedBannerTitle) {
+        elements.sharedBannerTitle.textContent = `Custom Shared Scenario: ${roleObj.title}`;
+      }
+      if (elements.sharedBannerSubtitle) {
+        elements.sharedBannerSubtitle.textContent = `Starting at ${formatCurrency(state.currentBaseSalary)} · ${state.wealthSavingsRate}% annual savings rate (@ ${(state.wealthReturnRate * 100).toFixed(1)}% return).`;
+      }
+
+      if (elements.sharedBannerResetBtn) {
+        elements.sharedBannerResetBtn.addEventListener("click", () => {
+          window.history.replaceState({}, "", window.location.pathname);
+          if (elements.sharedScenarioBanner) elements.sharedScenarioBanner.style.display = "none";
+          if (elements.resetCalcBtn) elements.resetCalcBtn.click();
+        });
+      }
+
+      if (elements.sharedBannerCloseBtn) {
+        elements.sharedBannerCloseBtn.addEventListener("click", () => {
+          if (elements.sharedScenarioBanner) elements.sharedScenarioBanner.style.display = "none";
+        });
+      }
+
+      showToast("✨ Loaded custom shared trajectory!");
+    }
   };
 
   /* ==========================================================================
@@ -3153,5 +3445,6 @@ Warm regards,
   initCompareModal();
   initNavigation();
   initUrlStateLoader();
+  initShareModalListeners();
   registerServiceWorker();
 });

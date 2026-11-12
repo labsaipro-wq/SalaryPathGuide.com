@@ -161,7 +161,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.2">
+  <link rel="stylesheet" href="styles.css?v=3.3">
   <style>
     .modal-overlay.open,
     .modal-overlay.active {
@@ -347,6 +347,21 @@
           <p class="section-desc">
             Simulate your financial future by modeling annual merit raises, target promotion cycles, and compounding bonuses over a 5-year horizon.
           </p>
+        </div>
+
+        <!-- Shared Custom Scenario Banner -->
+        <div id="sharedScenarioBanner" style="display: none; background: #0A1128; color: #FFFFFF; padding: 0.85rem 1.25rem; border-radius: var(--radius-lg); margin-bottom: 1.5rem; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; box-shadow: var(--shadow-md); border-left: 4px solid var(--emerald-primary);">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <span style="font-size: 1.35rem;">✨</span>
+            <div>
+              <div style="font-size: 0.875rem; font-weight: 800; letter-spacing: -0.01em;" id="sharedBannerTitle">Custom Shared Scenario Loaded</div>
+              <div style="font-size: 0.75rem; color: #94A3B8;" id="sharedBannerSubtitle">Viewing customized compensation trajectory, equity vesting, and FIRE milestones.</div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button type="button" id="sharedBannerResetBtn" class="btn btn-sm" style="background: rgba(255,255,255,0.12); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.25); font-size: 0.75rem; padding: 0.35rem 0.75rem; font-weight: 600;">Reset to Defaults</button>
+            <button type="button" id="sharedBannerCloseBtn" aria-label="Dismiss banner" style="background: none; border: none; color: #94A3B8; font-size: 1.25rem; cursor: pointer; padding: 0.2rem 0.4rem; line-height: 1;">✕</button>
+          </div>
         </div>
 
         <div class="calc-wrapper">
@@ -937,8 +952,18 @@
                 </div>
               </div>
 
-              <div style="display: flex; gap: 0.5rem;">
-                <button type="button" id="evalRecalculateBtn" class="btn btn-emerald btn-sm" style="flex: 1;">Evaluate Offer</button>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" id="evalRecalculateBtn" class="btn btn-emerald btn-sm" style="flex: 1; min-width: 120px;">Evaluate Offer</button>
+                <button type="button" id="evalShareBtn" class="btn btn-outline-dark btn-sm" style="white-space: nowrap; display: inline-flex; align-items: center; gap: 0.35rem;" title="Share this evaluated offer link">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                  </svg>
+                  Share Offer
+                </button>
                 <button type="button" id="evalPrintBtn" class="btn btn-outline-dark btn-sm" style="white-space: nowrap; display: inline-flex; align-items: center; gap: 0.35rem;">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -1868,6 +1893,101 @@
     </div>
   </div>
 
+  <!-- Share Scenario Modal -->
+  <div class="modal-overlay" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+    <div class="modal-container" style="max-width: 620px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="shareModalTitle" style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.15rem;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--emerald-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"></circle>
+            <circle cx="6" cy="12" r="3"></circle>
+            <circle cx="18" cy="19" r="3"></circle>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+          </svg>
+          Share Customized Scenario
+        </h3>
+        <button class="modal-close-btn" id="shareModalClose" aria-label="Close share modal">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.5rem;">
+        <p style="font-size: 0.875rem; color: var(--slate-text); margin-bottom: 1.25rem; line-height: 1.5;">
+          Anyone with this direct link will immediately view your customized leveling, 5-year compensation trajectory, equity grants, and FIRE projections.
+        </p>
+
+        <!-- URL Copy Field -->
+        <div class="form-group" style="margin-bottom: 1.25rem;">
+          <label class="form-label" for="shareUrlInput" style="font-weight: 700;">Direct Scenario Deep-Link</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="shareUrlInput" class="form-input" readonly style="background: var(--slate-surface); font-family: var(--font-mono); font-size: 0.8125rem; font-weight: 600; color: var(--navy-dark); cursor: pointer;" onclick="this.select();">
+            <button type="button" id="copyShareUrlBtn" class="btn btn-emerald btn-sm" style="white-space: nowrap; padding: 0.5rem 1rem;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span id="copyShareBtnText">Copy Link</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Scenario Snapshot Card -->
+        <div id="shareSnapshotCard" style="background: var(--slate-surface); border: 1px solid var(--slate-border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 0.875rem; font-weight: 800; color: var(--navy-dark);" id="shareSnapshotRole">Senior Software Engineer</span>
+            <span class="badge badge-emerald" id="shareSnapshotBadge">Nominal · Cash Only</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; text-align: center; margin-top: 0.75rem;">
+            <div style="background: #FFFFFF; border: 1px solid var(--slate-border); border-radius: var(--radius-sm); padding: 0.5rem;">
+              <div style="font-size: 0.6875rem; color: var(--slate-text-muted); font-weight: 700; text-transform: uppercase;">Starting Base</div>
+              <div style="font-family: var(--font-mono); font-weight: 800; color: var(--navy-dark); font-size: 0.9375rem;" id="shareSnapshotStartBase">$112,000</div>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid var(--slate-border); border-radius: var(--radius-sm); padding: 0.5rem;">
+              <div style="font-size: 0.6875rem; color: var(--slate-text-muted); font-weight: 700; text-transform: uppercase;">5-Yr Total Comp</div>
+              <div style="font-family: var(--font-mono); font-weight: 800; color: var(--emerald-dark); font-size: 0.9375rem;" id="shareSnapshotTotal">$829,579</div>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid var(--slate-border); border-radius: var(--radius-sm); padding: 0.5rem;">
+              <div style="font-size: 0.6875rem; color: var(--slate-text-muted); font-weight: 700; text-transform: uppercase;">5-Yr Invested Wealth</div>
+              <div style="font-family: var(--font-mono); font-weight: 800; color: var(--navy-dark); font-size: 0.9375rem;" id="shareSnapshotWealth">$416,311</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Social & Platform Share Buttons -->
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" id="shareTwitterBtn" class="btn btn-outline-dark btn-sm" style="flex: 1; min-width: 110px; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+            </svg>
+            Share on X
+          </button>
+          <button type="button" id="shareLinkedInBtn" class="btn btn-outline-dark btn-sm" style="flex: 1; min-width: 110px; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9h2.77v8.37H6.46v-8.37M7.85 6.47a1.6 1.6 0 0 0-1.6 1.6 1.6 1.6 0 0 0 1.6 1.6 1.6 1.6 0 0 0 1.6-1.6 1.6 1.6 0 0 0-1.6-1.6z"></path>
+            </svg>
+            LinkedIn
+          </button>
+          <button type="button" id="shareEmailBtn" class="btn btn-outline-dark btn-sm" style="flex: 1; min-width: 110px; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Email
+          </button>
+          <button type="button" id="shareTextSummaryBtn" class="btn btn-outline-dark btn-sm" style="flex: 1; min-width: 110px; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6"></line>
+              <line x1="8" y1="12" x2="21" y2="12"></line>
+              <line x1="8" y1="18" x2="21" y2="18"></line>
+              <line x1="3" y1="6" x2="3.01" y2="6"></line>
+              <line x1="3" y1="12" x2="3.01" y2="12"></line>
+              <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+            Copy Text
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notice -->
   <div class="toast-notice" id="toastNotice">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1945,7 +2065,7 @@
   </footer>
 
   <!-- App Data and Scripts -->
-  <script src="data/careerData.js?v=3.2"></script>
-  <script src="app.js?v=3.2"></script>
+  <script src="data/careerData.js?v=3.3"></script>
+  <script src="app.js?v=3.3"></script>
 </body>
 </html>
