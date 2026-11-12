@@ -57,7 +57,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=2.4">
+  <link rel="stylesheet" href="styles.css?v=2.6">
   <style>
     .modal-overlay.open,
     .modal-overlay.active {
@@ -451,6 +451,67 @@
                 </div>
               </div>
 
+              <!-- Equity Vesting & Refresher Simulator Accordion -->
+              <div style="margin-top: 1rem;">
+                <button type="button" class="advanced-toggle-btn" id="equityToggleBtn" style="border-color: rgba(59, 130, 246, 0.4); background: #EFF6FF; color: #1D4ED8;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="equityArrow">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                  </svg>
+                  <span>Equity Vesting &amp; Refresher Simulator</span>
+                </button>
+
+                <div class="advanced-options" id="equityOptionsPanel" style="display: none; padding-top: 1rem;">
+                  <div style="font-size: 0.8125rem; color: var(--slate-text-muted); margin-bottom: 0.75rem;">
+                    Model Restricted Stock Units (RSUs), 4-year vesting schedules (Google vs. Amazon), and stacking annual performance refreshers.
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                      <input type="checkbox" id="enableEquityToggle" style="accent-color: #2563EB; width: 16px; height: 16px; cursor: pointer;">
+                      <span style="font-weight: 700; color: var(--navy-dark);">Enable Equity Grants &amp; Stock Refreshers</span>
+                    </label>
+                  </div>
+
+                  <div id="equityInputsWrap" style="display: none; flex-direction: column; gap: 1rem;">
+                    <div class="form-group">
+                      <div class="form-label-row">
+                        <label class="form-label" for="equityInitialGrant">4-Year Initial Equity Grant ($)</label>
+                        <span class="form-badge" id="equityInitialBadge">$160,000</span>
+                      </div>
+                      <div class="currency-input-wrap">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" id="equityInitialGrant" class="form-input" min="0" max="3000000" step="5000" value="160000">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label" for="equityVestingSchedule">Vesting Schedule Structure</label>
+                      <select id="equityVestingSchedule" class="form-select">
+                        <option value="standard" selected>Standard 25% / 25% / 25% / 25% (Google, Meta, Apple)</option>
+                        <option value="amazon">Amazon Backloaded 5% / 15% / 40% / 40%</option>
+                        <option value="frontloaded">Frontloaded 33% / 33% / 22% / 12% (Startups)</option>
+                        <option value="uniform">Uniform 20% / yr (5-Year Plan)</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="form-label-row">
+                        <label class="form-label" for="equityRefresherGrant">Annual Stock Refresher Grant ($)</label>
+                        <span class="form-badge" id="equityRefresherBadge">$35,000 / yr</span>
+                      </div>
+                      <div class="currency-input-wrap">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" id="equityRefresherGrant" class="form-input" min="0" max="1000000" step="5000" value="35000">
+                      </div>
+                      <div style="font-size: 0.75rem; color: var(--slate-text-muted); margin-top: 0.35rem;">
+                        Granted annually starting Year 2; stacks on top of initial grant to eliminate Year 4 compensation drop.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="calc-actions">
                 <button type="button" id="resetCalcBtn" class="btn btn-outline-dark btn-sm" style="flex: 1;">Reset Defaults</button>
                 <button type="button" id="copySummaryBtn" class="btn btn-emerald btn-sm" style="flex: 1;">Copy Summary</button>
@@ -554,6 +615,16 @@
                   * Projections assume consistent merit performance and on-schedule leveling evaluations. Figures benchmarked against 2026 tech compensation bands.
                 </p>
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button type="button" id="shareTrajectoryBtn" class="btn btn-outline-dark btn-sm" aria-label="Share customized trajectory">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="18" cy="5" r="3"></circle>
+                      <circle cx="6" cy="12" r="3"></circle>
+                      <circle cx="18" cy="19" r="3"></circle>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                    Share Trajectory
+                  </button>
                   <button type="button" id="downloadCsvBtn" class="btn btn-outline-dark btn-sm">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -583,6 +654,27 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- 2026 Compensation Report Lead Magnet Card -->
+        <div class="lead-magnet-card">
+          <div class="lead-magnet-info">
+            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(16,185,129,0.15); border: 1px solid var(--emerald-primary); color: var(--emerald-light); padding: 0.25rem 0.75rem; border-radius: var(--radius-pill); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.75rem;">
+              Free 2026 Executive Intelligence Briefing
+            </div>
+            <h3 style="font-size: 1.5rem; font-weight: 800; color: #FFFFFF; margin-bottom: 0.5rem;">
+              Download the 2026 Compensation &amp; Leveling Report
+            </h3>
+            <p style="font-size: 0.875rem; color: #CBD5E1; line-height: 1.6;">
+              Get verified compensation percentiles, cross-company equity bands, and negotiation leverage tactics compiled from over 18,500 verified tech, medical, and corporate offers.
+            </p>
+          </div>
+          <form class="lead-magnet-form" id="leadMagnetForm">
+            <input type="email" id="leadEmail" class="form-input" placeholder="Enter your work or personal email..." required style="min-width: 260px; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #FFFFFF;">
+            <button type="submit" class="btn btn-emerald btn-sm" style="white-space: nowrap;">
+              Get Free PDF Report →
+            </button>
+          </form>
         </div>
       </div>
     </section>
@@ -1026,6 +1118,24 @@
     </div>
   </div>
 
+  <!-- Compensation Terms Glossary Modal -->
+  <div class="modal-overlay" id="glossaryModal" role="dialog" aria-modal="true" aria-labelledby="glossaryModalTitle">
+    <div class="modal-container" style="max-width: 820px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="glossaryModalTitle">📚 Compensation &amp; Leveling Glossary</h3>
+        <button class="modal-close-btn" id="glossaryModalClose" aria-label="Close glossary modal" onclick="document.getElementById('glossaryModal').classList.remove('open','active')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.875rem; color: var(--slate-text-muted); margin-bottom: 1.25rem;">
+          Essential recruiter and total compensation terminology to help you evaluate equity grants, negotiate cliffs, and maximize your take-home wealth.
+        </p>
+        <div class="glossary-grid" id="glossaryGrid">
+          <!-- Populated dynamically via app.js -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notice -->
   <div class="toast-notice" id="toastNotice">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1075,6 +1185,7 @@
           <ul class="footer-links">
             <li><a href="#calculator">5-Year Trajectory Calculator</a></li>
             <li><a href="#offer-evaluator">Offer Evaluator &amp; Counter-Generator</a></li>
+            <li><a href="#" id="footerGlossaryTrigger" onclick="event.preventDefault(); document.getElementById('glossaryModal').classList.add('open','active');">Compensation Glossary &amp; Terms</a></li>
             <li><a href="#" id="footerSubmitOfferTrigger" onclick="event.preventDefault(); document.getElementById('submitOfferModal').classList.add('open','active');">Submit Anonymous Pay Data</a></li>
             <li><a href="#negotiation">Salary Negotiation Scripts</a></li>
             <li><a href="#resources">System Design Blueprint</a></li>
@@ -1102,7 +1213,7 @@
   </footer>
 
   <!-- App Data and Scripts -->
-  <script src="data/careerData.js?v=2.5"></script>
-  <script src="app.js?v=2.5"></script>
+  <script src="data/careerData.js?v=2.6"></script>
+  <script src="app.js?v=2.6"></script>
 </body>
 </html>

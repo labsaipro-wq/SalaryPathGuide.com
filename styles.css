@@ -2082,6 +2082,111 @@ input, select, textarea {
 }
 
 /* ==========================================================================
+   Glossary & Educational Intelligence Modals
+   ========================================================================== */
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.glossary-card {
+  background: #F8FAFC;
+  border: 1px solid var(--slate-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.glossary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--emerald-primary);
+}
+
+.glossary-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.glossary-term {
+  font-weight: 800;
+  color: var(--navy-dark);
+  font-size: 1rem;
+}
+
+.glossary-acronym {
+  background: var(--emerald-surface);
+  color: var(--emerald-dark);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-pill);
+}
+
+.glossary-def {
+  font-size: 0.8125rem;
+  color: var(--slate-text-main);
+  line-height: 1.55;
+  margin-bottom: 0.75rem;
+}
+
+.glossary-tip {
+  font-size: 0.75rem;
+  background: rgba(16, 185, 129, 0.08);
+  border-left: 3px solid var(--emerald-primary);
+  padding: 0.5rem 0.65rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--navy-dark);
+  line-height: 1.45;
+}
+
+/* Lead Magnet Banner */
+.lead-magnet-card {
+  background: radial-gradient(circle at 10% 20%, #162248 0%, var(--navy-dark) 80%);
+  border: 1px solid var(--navy-border);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: 3.5rem;
+  box-shadow: var(--shadow-xl);
+}
+
+.lead-magnet-info {
+  max-width: 600px;
+}
+
+.lead-magnet-form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .lead-magnet-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.75rem;
+  }
+  .lead-magnet-form {
+    width: 100%;
+    flex-direction: column;
+  }
+  .lead-magnet-form input,
+  .lead-magnet-form button {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
    Print Styles for PDF Export
    ========================================================================== */
 @media print {

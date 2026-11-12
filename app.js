@@ -39,6 +39,10 @@ document.addEventListener("DOMContentLoaded", () => {
     partnerRoleId: "dentist",
     partnerBaseSalary: 120000,
     partnerRaisePct: 4.0,
+    enableEquity: false,
+    equityInitialGrant: 160000,
+    equityVestingSchedule: "standard",
+    equityRefresherGrant: 35000,
     currentTrajectoryData: [],
     // Script customizer defaults
     scriptCompany: "Acme Cloud",
@@ -198,6 +202,28 @@ document.addEventListener("DOMContentLoaded", () => {
     subEquity: document.getElementById("subEquity"),
     subSignon: document.getElementById("subSignon"),
     subNotes: document.getElementById("subNotes"),
+
+    // Share Trajectory Button
+    shareTrajectoryBtn: document.getElementById("shareTrajectoryBtn"),
+
+    // Equity Vesting Simulator Elements
+    equityToggleBtn: document.getElementById("equityToggleBtn"),
+    equityOptionsPanel: document.getElementById("equityOptionsPanel"),
+    equityArrow: document.getElementById("equityArrow"),
+    enableEquityToggle: document.getElementById("enableEquityToggle"),
+    equityInputsWrap: document.getElementById("equityInputsWrap"),
+    equityInitialGrant: document.getElementById("equityInitialGrant"),
+    equityInitialBadge: document.getElementById("equityInitialBadge"),
+    equityVestingSchedule: document.getElementById("equityVestingSchedule"),
+    equityRefresherGrant: document.getElementById("equityRefresherGrant"),
+    equityRefresherBadge: document.getElementById("equityRefresherBadge"),
+
+    // Glossary & Lead Magnet Elements
+    glossaryModal: document.getElementById("glossaryModal"),
+    glossaryModalClose: document.getElementById("glossaryModalClose"),
+    glossaryGrid: document.getElementById("glossaryGrid"),
+    leadMagnetForm: document.getElementById("leadMagnetForm"),
+    leadEmail: document.getElementById("leadEmail"),
 
     toastNotice: document.getElementById("toastNotice"),
     toastMessage: document.getElementById("toastMessage")
@@ -600,6 +626,58 @@ document.addEventListener("DOMContentLoaded", () => {
       elements.printDateDossier.textContent = "Generated: " + new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
     }
 
+    // Share Trajectory Button
+    if (elements.shareTrajectoryBtn) {
+      elements.shareTrajectoryBtn.addEventListener("click", () => {
+        shareTrajectoryLink();
+      });
+    }
+
+    // Equity Vesting & Refresher Simulator Setup
+    if (elements.equityToggleBtn) {
+      elements.equityToggleBtn.addEventListener("click", () => {
+        const isHidden = elements.equityOptionsPanel.style.display === "none";
+        elements.equityOptionsPanel.style.display = isHidden ? "block" : "none";
+        if (elements.equityArrow) {
+          elements.equityArrow.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+        }
+      });
+    }
+
+    if (elements.enableEquityToggle) {
+      elements.enableEquityToggle.addEventListener("change", (e) => {
+        state.enableEquity = e.target.checked;
+        if (elements.equityInputsWrap) {
+          elements.equityInputsWrap.style.display = state.enableEquity ? "flex" : "none";
+        }
+        runTrajectoryCalculations();
+        showToast(state.enableEquity ? "Equity Vesting & Refresher Simulator enabled!" : "Reverted to cash-only trajectory.");
+      });
+    }
+
+    if (elements.equityInitialGrant) {
+      elements.equityInitialGrant.addEventListener("input", (e) => {
+        state.equityInitialGrant = Math.max(0, Number(e.target.value) || 0);
+        if (elements.equityInitialBadge) elements.equityInitialBadge.textContent = formatCurrency(state.equityInitialGrant);
+        runTrajectoryCalculations();
+      });
+    }
+
+    if (elements.equityVestingSchedule) {
+      elements.equityVestingSchedule.addEventListener("change", (e) => {
+        state.equityVestingSchedule = e.target.value;
+        runTrajectoryCalculations();
+      });
+    }
+
+    if (elements.equityRefresherGrant) {
+      elements.equityRefresherGrant.addEventListener("input", (e) => {
+        state.equityRefresherGrant = Math.max(0, Number(e.target.value) || 0);
+        if (elements.equityRefresherBadge) elements.equityRefresherBadge.textContent = `${formatCurrency(state.equityRefresherGrant)} / yr`;
+        runTrajectoryCalculations();
+      });
+    }
+
     // Print Report button
     elements.printReportBtn.addEventListener("click", () => {
       window.print();
@@ -693,6 +771,34 @@ document.addEventListener("DOMContentLoaded", () => {
         adjustedTotalComp += partnerAnnualComp;
       }
 
+      // Equity & Stock Refresher Simulation
+      let annualEquityVested = 0;
+      if (state.enableEquity) {
+        const scheduleMap = {
+          standard: [0.25, 0.25, 0.25, 0.25, 0.0],
+          amazon: [0.05, 0.15, 0.40, 0.40, 0.0],
+          frontloaded: [0.33, 0.33, 0.22, 0.12, 0.0],
+          uniform: [0.20, 0.20, 0.20, 0.20, 0.20]
+        };
+        const rates = scheduleMap[state.equityVestingSchedule] || scheduleMap.standard;
+        const initialVested = (state.equityInitialGrant || 0) * (rates[y - 1] || 0);
+
+        // Stacking performance refreshers granted annually starting Year 2 (4-yr vest)
+        let refresherVested = 0;
+        const refGrant = state.equityRefresherGrant || 0;
+        if (y >= 2) {
+          const activeRefresherCount = (y - 1);
+          refresherVested = activeRefresherCount * (refGrant * 0.25);
+        }
+
+        let totalEquityNominal = initialVested + refresherVested;
+        if (state.adjustForInflation) {
+          totalEquityNominal = totalEquityNominal / Math.pow(1 + state.inflationRate, y);
+        }
+        annualEquityVested = totalEquityNominal * netMultiplier;
+        adjustedTotalComp += annualEquityVested;
+      }
+
       cumulativeComp += adjustedTotalComp;
 
       const levelObj = role.levels[currentLevelIndex];
@@ -708,6 +814,7 @@ document.addEventListener("DOMContentLoaded", () => {
         meritIncrease: meritIncrease * netMultiplier,
         promoIncrease: promoIncrease * netMultiplier,
         annualBonus: (state.adjustForInflation ? (annualBonus / Math.pow(1 + state.inflationRate, y)) : annualBonus) * netMultiplier,
+        annualEquityVested,
         totalAnnualComp: adjustedTotalComp,
         cumulativeComp
       });
@@ -785,11 +892,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const labels = yearData.map(d => `Year ${d.year} (${d.levelCode})`);
     const baseSalaries = yearData.map(d => Math.round(d.baseSalary * info.rate));
     const annualBonuses = yearData.map(d => Math.round(d.annualBonus * info.rate));
+    const equityGrants = yearData.map(d => Math.round((d.annualEquityVested || 0) * info.rate));
 
     if (trajectoryChartInstance) {
       trajectoryChartInstance.data.labels = labels;
       trajectoryChartInstance.data.datasets[0].data = baseSalaries;
       trajectoryChartInstance.data.datasets[1].data = annualBonuses;
+
+      if (state.enableEquity) {
+        if (!trajectoryChartInstance.data.datasets[2]) {
+          trajectoryChartInstance.data.datasets.push({
+            label: `Equity & Stock Refreshers (${info.code})`,
+            data: equityGrants,
+            backgroundColor: "#2563EB",
+            borderRadius: 6,
+            stack: "Stack 0",
+            maxBarThickness: 55
+          });
+        } else {
+          trajectoryChartInstance.data.datasets[2].data = equityGrants;
+        }
+      } else if (trajectoryChartInstance.data.datasets[2]) {
+        trajectoryChartInstance.data.datasets.pop();
+      }
+
       trajectoryChartInstance.options.scales.y.ticks.callback = (value) => `${info.symbol}${Math.round(value / 1000)}k`;
       trajectoryChartInstance.update();
       return;
@@ -797,28 +923,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Chart.js instantiation with modern fintech navy & emerald styling
     const ctx = elements.chartCanvas.getContext("2d");
+    const initialDatasets = [
+      {
+        label: `Base Salary (${info.code})`,
+        data: baseSalaries,
+        backgroundColor: "#0A1128",
+        borderRadius: 6,
+        stack: "Stack 0",
+        maxBarThickness: 55
+      },
+      {
+        label: `Annual Performance Bonus (${info.code})`,
+        data: annualBonuses,
+        backgroundColor: "#10B981",
+        borderRadius: 6,
+        stack: "Stack 0",
+        maxBarThickness: 55
+      }
+    ];
+
+    if (state.enableEquity) {
+      initialDatasets.push({
+        label: `Equity & Stock Refreshers (${info.code})`,
+        data: equityGrants,
+        backgroundColor: "#2563EB",
+        borderRadius: 6,
+        stack: "Stack 0",
+        maxBarThickness: 55
+      });
+    }
+
     trajectoryChartInstance = new Chart(ctx, {
       type: "bar",
       data: {
         labels: labels,
-        datasets: [
-          {
-            label: `Base Salary (${info.code})`,
-            data: baseSalaries,
-            backgroundColor: "#0A1128",
-            borderRadius: 6,
-            stack: "Stack 0",
-            maxBarThickness: 55
-          },
-          {
-            label: `Annual Performance Bonus (${info.code})`,
-            data: annualBonuses,
-            backgroundColor: "#10B981",
-            borderRadius: 6,
-            stack: "Stack 0",
-            maxBarThickness: 55
-          }
-        ]
+        datasets: initialDatasets
       },
       options: {
         responsive: true,
@@ -2174,6 +2313,229 @@ Warm regards,
   };
 
   /* ==========================================================================
+     Share Trajectory & URL State Loader (Viral Loop)
+     ========================================================================== */
+  const shareTrajectoryLink = () => {
+    const params = new URLSearchParams();
+    params.set("r", state.selectedRoleId);
+    params.set("b", Math.round(state.currentBaseSalary));
+    params.set("raise", state.annualRaisePct);
+    params.set("promo", state.promoInterval);
+    params.set("bump", state.promoBumpPct);
+    params.set("bonus", state.bonusPct);
+    params.set("loc", state.calcLocationMultiplier);
+    if (state.adjustForInflation) params.set("inf", "1");
+    if (state.taxMode === "net") params.set("tax", "net");
+    if (state.enableHousehold) {
+      params.set("hh", "1");
+      params.set("pr", state.partnerRoleId);
+      params.set("pb", Math.round(state.partnerBaseSalary));
+      params.set("pra", state.partnerRaisePct);
+    }
+    if (state.enableEquity) {
+      params.set("eq", "1");
+      params.set("eg", Math.round(state.equityInitialGrant));
+      params.set("vs", state.equityVestingSchedule);
+      params.set("er", Math.round(state.equityRefresherGrant));
+    }
+
+    const shareUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, "", shareUrl);
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        showToast("🔗 Custom trajectory link copied to clipboard!");
+      }).catch(() => {
+        prompt("Copy this customized trajectory link:", shareUrl);
+      });
+    } else {
+      prompt("Copy this customized trajectory link:", shareUrl);
+    }
+  };
+
+  const initUrlStateLoader = () => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.toString()) return;
+
+    if (params.has("r")) {
+      const r = params.get("r");
+      if (roles.some(role => role.id === r)) {
+        state.selectedRoleId = r;
+        if (elements.calcJobTitle) elements.calcJobTitle.value = r;
+      }
+    }
+    if (params.has("b")) {
+      const b = Number(params.get("b"));
+      if (!isNaN(b) && b > 0) updateBaseSalary(b);
+    }
+    if (params.has("raise")) {
+      const val = Number(params.get("raise"));
+      if (!isNaN(val)) {
+        state.annualRaisePct = val;
+        if (elements.calcAnnualRaise) elements.calcAnnualRaise.value = val;
+        if (elements.calcRaiseBadge) elements.calcRaiseBadge.textContent = `${val.toFixed(1)}%`;
+      }
+    }
+    if (params.has("promo")) {
+      const val = Number(params.get("promo"));
+      if (!isNaN(val)) {
+        state.promoInterval = val;
+        if (elements.calcPromoInterval) elements.calcPromoInterval.value = val;
+      }
+    }
+    if (params.has("bump")) {
+      const val = Number(params.get("bump"));
+      if (!isNaN(val)) {
+        state.promoBumpPct = val;
+        if (elements.calcPromoBump) elements.calcPromoBump.value = val;
+        if (elements.calcBumpBadge) elements.calcBumpBadge.textContent = `${val}%`;
+      }
+    }
+    if (params.has("bonus")) {
+      const val = Number(params.get("bonus"));
+      if (!isNaN(val)) {
+        state.bonusPct = val;
+        if (elements.calcBonusPct) elements.calcBonusPct.value = val;
+        if (elements.calcBonusBadge) elements.calcBonusBadge.textContent = `${val}%`;
+      }
+    }
+    if (params.has("loc")) {
+      const val = Number(params.get("loc"));
+      if (!isNaN(val)) {
+        state.calcLocationMultiplier = val;
+        if (elements.calcLocationTier) elements.calcLocationTier.value = val.toString();
+      }
+    }
+    if (params.has("inf")) {
+      state.adjustForInflation = true;
+      if (elements.calcInflationToggle) elements.calcInflationToggle.checked = true;
+    }
+    if (params.has("tax") && params.get("tax") === "net") {
+      state.taxMode = "net";
+      if (elements.taxModeSwitch) {
+        elements.taxModeSwitch.querySelectorAll(".mode-switch-btn").forEach(b => {
+          b.classList.toggle("active", b.getAttribute("data-mode") === "net");
+        });
+      }
+    }
+    if (params.has("hh")) {
+      state.enableHousehold = true;
+      if (elements.enableHouseholdToggle) elements.enableHouseholdToggle.checked = true;
+      if (elements.householdInputsWrap) elements.householdInputsWrap.style.display = "flex";
+      if (elements.householdOptionsPanel) elements.householdOptionsPanel.style.display = "block";
+      if (params.has("pr")) state.partnerRoleId = params.get("pr");
+      if (params.has("pb")) {
+        state.partnerBaseSalary = Number(params.get("pb")) || 120000;
+        if (elements.partnerBaseSalary) elements.partnerBaseSalary.value = state.partnerBaseSalary;
+        if (elements.partnerBaseBadge) elements.partnerBaseBadge.textContent = formatCurrency(state.partnerBaseSalary);
+      }
+      if (params.has("pra")) {
+        state.partnerRaisePct = Number(params.get("pra")) || 4.0;
+        if (elements.partnerRaise) elements.partnerRaise.value = state.partnerRaisePct;
+        if (elements.partnerRaiseBadge) elements.partnerRaiseBadge.textContent = `${state.partnerRaisePct.toFixed(1)}%`;
+      }
+    }
+    if (params.has("eq")) {
+      state.enableEquity = true;
+      if (elements.enableEquityToggle) elements.enableEquityToggle.checked = true;
+      if (elements.equityInputsWrap) elements.equityInputsWrap.style.display = "flex";
+      if (elements.equityOptionsPanel) elements.equityOptionsPanel.style.display = "block";
+      if (params.has("eg")) {
+        state.equityInitialGrant = Number(params.get("eg")) || 160000;
+        if (elements.equityInitialGrant) elements.equityInitialGrant.value = state.equityInitialGrant;
+        if (elements.equityInitialBadge) elements.equityInitialBadge.textContent = formatCurrency(state.equityInitialGrant);
+      }
+      if (params.has("vs")) {
+        state.equityVestingSchedule = params.get("vs");
+        if (elements.equityVestingSchedule) elements.equityVestingSchedule.value = state.equityVestingSchedule;
+      }
+      if (params.has("er")) {
+        state.equityRefresherGrant = Number(params.get("er")) || 35000;
+        if (elements.equityRefresherGrant) elements.equityRefresherGrant.value = state.equityRefresherGrant;
+        if (elements.equityRefresherBadge) elements.equityRefresherBadge.textContent = `${formatCurrency(state.equityRefresherGrant)} / yr`;
+      }
+    }
+
+    runTrajectoryCalculations();
+    showToast("✨ Loaded custom shared trajectory!");
+  };
+
+  /* ==========================================================================
+     Compensation Glossary Modal
+     ========================================================================== */
+  const initGlossaryModal = () => {
+    if (!elements.glossaryGrid || !window.CAREER_DATA || !window.CAREER_DATA.glossary) return;
+
+    elements.glossaryGrid.innerHTML = window.CAREER_DATA.glossary.map(item => `
+      <div class="glossary-card">
+        <div class="glossary-card-header">
+          <span class="glossary-term">${item.term}</span>
+          <span class="glossary-acronym">${item.acronym}</span>
+        </div>
+        <p class="glossary-def">${item.definition}</p>
+        <div class="glossary-tip"><strong>Negotiation Tip:</strong> ${item.tip}</div>
+      </div>
+    `).join("");
+
+    if (elements.glossaryModalClose) {
+      elements.glossaryModalClose.addEventListener("click", (e) => {
+        e.preventDefault();
+        elements.glossaryModal.classList.remove("open", "active");
+      });
+    }
+
+    if (elements.glossaryModal) {
+      elements.glossaryModal.addEventListener("click", (e) => {
+        if (e.target === elements.glossaryModal) {
+          elements.glossaryModal.classList.remove("open", "active");
+        }
+      });
+    }
+  };
+
+  /* ==========================================================================
+     Lead Magnet: 2026 Compensation Report
+     ========================================================================== */
+  const initLeadMagnet = () => {
+    if (!elements.leadMagnetForm) return;
+
+    elements.leadMagnetForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = (elements.leadEmail && elements.leadEmail.value.trim()) || "";
+      if (!email) return;
+
+      const payload = {
+        timestamp: new Date().toISOString(),
+        company: "Report Subscriber: " + email,
+        role: "2026 Compensation Report Lead",
+        level: "Subscriber",
+        location: email,
+        baseSalary: 0,
+        bonusPct: 0,
+        equity: 0,
+        signon: 0,
+        totalCompYear1: 0,
+        notes: "Requested 2026 Executive Compensation Benchmark PDF"
+      };
+
+      const webhookUrl = GOOGLE_SHEET_WEBHOOK_URL || localStorage.getItem("spg_webhook_url");
+      if (webhookUrl && webhookUrl.startsWith("http")) {
+        try {
+          fetch(webhookUrl, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify(payload)
+          }).catch(() => {});
+        } catch (err) {}
+      }
+
+      showToast("🎉 2026 Executive Compensation Report has been sent to " + email);
+      elements.leadMagnetForm.reset();
+    });
+  };
+
+  /* ==========================================================================
      Service Worker Registration for PWA
      ========================================================================== */
   const registerServiceWorker = () => {
@@ -2193,10 +2555,13 @@ Warm regards,
   initLevelingMatrix();
   initGeoArbitrage();
   initSubmitOfferModal();
+  initGlossaryModal();
+  initLeadMagnet();
   initDirectory();
   initNegotiationPlaybook();
   initResources();
   initCompareModal();
   initNavigation();
+  initUrlStateLoader();
   registerServiceWorker();
 });

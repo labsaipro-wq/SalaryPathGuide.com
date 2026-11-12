@@ -1218,7 +1218,27 @@ const CAREER_DATA = {
       { id: "tor", name: "Toronto (Canada)", stateTax: 33.0, colIndex: 74, rentIndex: 68, housingMedian: "CA$1,050,000", tag: "Canadian Innovation Corridor" },
       { id: "rem", name: "Remote (Low/Medium Cost US)", stateTax: 3.5, colIndex: 65, rentIndex: 48, housingMedian: "$360,000", tag: "Maximum Wealth Surplus" }
     ]
-  }
+  },
+
+  // Equity Vesting Timelines & RSU Structures
+  vestingSchedules: [
+    { id: "standard", name: "Standard 25% / 25% / 25% / 25% (Google, Meta, Apple)", rates: [0.25, 0.25, 0.25, 0.25, 0.0] },
+    { id: "amazon", name: "Amazon Backloaded 5% / 15% / 40% / 40%", rates: [0.05, 0.15, 0.40, 0.40, 0.0] },
+    { id: "frontloaded", name: "Frontloaded 33% / 33% / 22% / 12% (Snap, Startups)", rates: [0.33, 0.33, 0.22, 0.12, 0.0] },
+    { id: "uniform", name: "Uniform 20% / yr (5-Year Health & Corporate Vesting)", rates: [0.20, 0.20, 0.20, 0.20, 0.20] }
+  ],
+
+  // Essential Compensation & Negotiation Terms Glossary
+  glossary: [
+    { term: "Total Compensation (TC)", acronym: "TC", definition: "The complete annual gross value: Base Salary + Target Annual Bonus + Annual Stock Vesting (RSUs) + Sign-on Bonus.", tip: "Never evaluate tech offers on base salary alone; equity and bonuses often represent 40–60% of take-home wealth." },
+    { term: "Restricted Stock Units (RSUs)", acronym: "RSU", definition: "Shares of public company stock granted to employees that vest over time. When vested, they function as liquid cash.", tip: "Public company RSUs are not monopoly money; they can be sold immediately upon vesting to fund index investments." },
+    { term: "Vesting Cliff", acronym: "Cliff", definition: "The initial tenure required before any granted shares vest (traditionally 12 months for 25% of the grant).", tip: "If an offer includes a 1-year cliff, request monthly vesting thereafter rather than quarterly or annual chunks." },
+    { term: "Stock Refresher Grant", acronym: "Refresher", definition: "Annual supplemental equity awarded during performance cycles that stacks on top of your existing initial grant.", tip: "Ask recruiters directly: 'What is the target annual equity refresher grant for engineers meeting expectations at this band?'" },
+    { term: "Sign-On Cliff", acronym: "Cliff Drop", definition: "The sudden drop in total compensation in Year 2 when upfront cash sign-on bonuses expire.", tip: "Always calculate Year 2-4 normalized comp and negotiate for an equity refresher to bridge the gap." },
+    { term: "Cost-of-Living Geo-Arbitrage", acronym: "Geo-Arb", definition: "Earning Tier-1 metro compensation while living in lower-cost or zero-income-tax states (e.g., WA, TX, FL).", tip: "Moving from SF to Austin or Seattle on equal compensation immediately saves $15,000–$35,000 annually in state taxes." },
+    { term: "FIRE Milestone", acronym: "FIRE", definition: "Financial Independence, Retire Early: having invested assets equal to 25x annual expenses (4% safe withdrawal rule).", tip: "A dual-income tech and healthcare household saving 35% can reach $1,000,000 in liquid wealth in ~3.5 to 4.5 years." },
+    { term: "83(b) Election", acronym: "83(b)", definition: "An IRS tax election allowing startup employees to pay taxes on early stock options upfront at low valuation.", tip: "Must be filed with the IRS within exactly 30 days of stock grant; missing this window can cause catastrophic tax bills later." }
+  ]
 };
 
 // Export to window for browser usage
