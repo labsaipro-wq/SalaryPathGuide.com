@@ -3608,3 +3608,93 @@ input, select, textarea {
   color: #FFFFFF;
   border-color: var(--emerald-primary);
 }
+
+/* ==========================================================================
+   Public RSU & Startup Options Exit Scenario Matrix
+   ========================================================================== */
+.equity-matrix-card {
+  background: #FFFFFF;
+  border: 1px solid var(--slate-border);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.equity-matrix-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--slate-border);
+}
+
+.equity-matrix-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--navy-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.equity-scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.equity-scenario-box {
+  background: var(--slate-surface);
+  border: 1px solid var(--slate-border);
+  border-radius: var(--radius-md);
+  padding: 0.9rem;
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.equity-scenario-box.active-scenario {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: var(--emerald-primary);
+  box-shadow: 0 0 0 1px var(--emerald-primary);
+}
+
+.equity-scenario-tag {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--slate-text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.equity-scenario-box.active-scenario .equity-scenario-tag {
+  color: var(--emerald-dark);
+}
+
+.equity-scenario-val {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--navy-dark);
+  margin-bottom: 0.2rem;
+}
+
+.equity-scenario-sub {
+  font-size: 0.75rem;
+  color: var(--slate-text-muted);
+}
+
+.equity-tax-callout {
+  background: rgba(37, 99, 235, 0.06);
+  border-left: 3px solid #2563EB;
+  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--slate-text);
+  line-height: 1.5;
+}

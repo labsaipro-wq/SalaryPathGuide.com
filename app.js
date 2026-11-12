@@ -40,9 +40,13 @@ document.addEventListener("DOMContentLoaded", () => {
     partnerBaseSalary: 120000,
     partnerRaisePct: 4.0,
     enableEquity: false,
+    equityVehicleType: "rsu",
     equityInitialGrant: 160000,
     equityVestingSchedule: "standard",
     equityRefresherGrant: 35000,
+    equityStockGrowth: 0,
+    equityExitMultiple: 3,
+    equity83b: true,
     currentTrajectoryData: [],
     // Compounding Wealth & FIRE Projector
     wealthSavingsRate: 35,
@@ -272,17 +276,28 @@ document.addEventListener("DOMContentLoaded", () => {
     sharedBannerResetBtn: document.getElementById("sharedBannerResetBtn"),
     sharedBannerCloseBtn: document.getElementById("sharedBannerCloseBtn"),
 
-    // Equity Vesting Simulator Elements
+    // Equity Vesting & Exit Simulator Elements
     equityToggleBtn: document.getElementById("equityToggleBtn"),
     equityOptionsPanel: document.getElementById("equityOptionsPanel"),
     equityArrow: document.getElementById("equityArrow"),
     enableEquityToggle: document.getElementById("enableEquityToggle"),
     equityInputsWrap: document.getElementById("equityInputsWrap"),
+    equityVehicleType: document.getElementById("equityVehicleType"),
     equityInitialGrant: document.getElementById("equityInitialGrant"),
     equityInitialBadge: document.getElementById("equityInitialBadge"),
     equityVestingSchedule: document.getElementById("equityVestingSchedule"),
     equityRefresherGrant: document.getElementById("equityRefresherGrant"),
     equityRefresherBadge: document.getElementById("equityRefresherBadge"),
+    equityStockGrowthGroup: document.getElementById("equityStockGrowthGroup"),
+    equityStockGrowth: document.getElementById("equityStockGrowth"),
+    equityStartupControlsGroup: document.getElementById("equityStartupControlsGroup"),
+    equityExitMultiple: document.getElementById("equityExitMultiple"),
+    equity83bToggle: document.getElementById("equity83bToggle"),
+    equityExitMatrixCard: document.getElementById("equityExitMatrixCard"),
+    equityMatrixTitle: document.getElementById("equityMatrixTitle"),
+    equityMatrixBadge: document.getElementById("equityMatrixBadge"),
+    equityScenariosGrid: document.getElementById("equityScenariosGrid"),
+    equityTaxCallout: document.getElementById("equityTaxCallout"),
 
     // Glossary & Lead Magnet Elements
     glossaryModal: document.getElementById("glossaryModal"),
@@ -765,6 +780,38 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     }
 
+    if (elements.equityVehicleType) {
+      elements.equityVehicleType.addEventListener("change", (e) => {
+        state.equityVehicleType = e.target.value;
+        const isStartup = state.equityVehicleType === "startup";
+        if (elements.equityStockGrowthGroup) elements.equityStockGrowthGroup.style.display = isStartup ? "none" : "block";
+        if (elements.equityStartupControlsGroup) elements.equityStartupControlsGroup.style.display = isStartup ? "flex" : "none";
+        runTrajectoryCalculations();
+        showToast(isStartup ? "🚀 Switched to Startup Stock Options & Exit Multiple Simulator" : "📈 Switched to Public RSU Volatility Simulator");
+      });
+    }
+
+    if (elements.equityStockGrowth) {
+      elements.equityStockGrowth.addEventListener("change", (e) => {
+        state.equityStockGrowth = Number(e.target.value) || 0;
+        runTrajectoryCalculations();
+      });
+    }
+
+    if (elements.equityExitMultiple) {
+      elements.equityExitMultiple.addEventListener("change", (e) => {
+        state.equityExitMultiple = Number(e.target.value);
+        runTrajectoryCalculations();
+      });
+    }
+
+    if (elements.equity83bToggle) {
+      elements.equity83bToggle.addEventListener("change", (e) => {
+        state.equity83b = e.target.checked;
+        runTrajectoryCalculations();
+      });
+    }
+
     // Compounding Wealth & FIRE Projector inputs
     if (elements.wealthSavingsRate) {
       elements.wealthSavingsRate.addEventListener("input", (e) => {
@@ -904,10 +951,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         let totalEquityNominal = initialVested + refresherVested;
+
+        if (state.equityVehicleType === "startup") {
+          const mult = state.equityExitMultiple !== undefined ? Number(state.equityExitMultiple) : 3;
+          totalEquityNominal *= mult;
+        } else {
+          const growth = Number(state.equityStockGrowth) || 0;
+          totalEquityNominal *= Math.pow(1 + growth, y - 0.5);
+        }
+
         if (state.adjustForInflation) {
           totalEquityNominal = totalEquityNominal / Math.pow(1 + state.inflationRate, y);
         }
-        annualEquityVested = totalEquityNominal * netMultiplier;
+
+        if (state.taxMode === "net" && state.equityVehicleType === "startup") {
+          const startupNetFactor = state.equity83b ? 0.80 : 0.63; // 20% LTCG vs 37% Ordinary/AMT
+          annualEquityVested = totalEquityNominal * startupNetFactor;
+        } else {
+          annualEquityVested = totalEquityNominal * netMultiplier;
+        }
         adjustedTotalComp += annualEquityVested;
       }
 
@@ -1035,9 +1097,147 @@ document.addEventListener("DOMContentLoaded", () => {
     // Render / Update Chart
     renderTrajectoryChart(yearData);
 
+    // Render Public RSU & Startup Exit Scenario Matrix
+    renderEquityExitMatrix(yearData);
+
     // Debounced URL state sync for seamless deep-linking
     if (typeof syncUrlStateDebounced === "function") {
       syncUrlStateDebounced();
+    }
+  };
+
+  const renderEquityExitMatrix = (yearData) => {
+    if (!elements.equityExitMatrixCard) return;
+
+    if (!state.enableEquity) {
+      elements.equityExitMatrixCard.style.display = "none";
+      return;
+    }
+
+    elements.equityExitMatrixCard.style.display = "block";
+
+    // Compute baseline 5-year unmultiplied vested equity grant sum
+    const scheduleMap = {
+      standard: [0.25, 0.25, 0.25, 0.25, 0.0],
+      amazon: [0.05, 0.15, 0.40, 0.40, 0.0],
+      frontloaded: [0.33, 0.33, 0.22, 0.12, 0.0],
+      uniform: [0.20, 0.20, 0.20, 0.20, 0.20]
+    };
+    const rates = scheduleMap[state.equityVestingSchedule] || scheduleMap.standard;
+    const baseByYear = [];
+    let totalBaselineEquity = 0;
+
+    for (let y = 1; y <= 5; y++) {
+      const initV = (state.equityInitialGrant || 0) * (rates[y - 1] || 0);
+      const refV = y >= 2 ? (y - 1) * ((state.equityRefresherGrant || 0) * 0.25) : 0;
+      const yrSum = initV + refV;
+      baseByYear.push(yrSum);
+      totalBaselineEquity += yrSum;
+    }
+
+    if (state.equityVehicleType === "startup") {
+      if (elements.equityMatrixTitle) {
+        elements.equityMatrixTitle.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path>
+          </svg>
+          Startup Options Exit Multiple &amp; 83(b) Tax Arbitrage Matrix
+        `;
+      }
+      if (elements.equityMatrixBadge) {
+        elements.equityMatrixBadge.textContent = state.equity83b ? "83(b) LTCG (20% Tax)" : "Ordinary / AMT (37% Tax)";
+      }
+
+      const multiples = [
+        { mult: 0, label: "0x Underwater" },
+        { mult: 1, label: "1x Flat Exit" },
+        { mult: 3, label: "3x M&A Exit" },
+        { mult: 5, label: "5x Breakout" },
+        { mult: 10, label: "10x Unicorn IPO" }
+      ];
+
+      const activeMult = Number(state.equityExitMultiple);
+      const taxRate = state.equity83b ? 0.20 : 0.37;
+
+      if (elements.equityScenariosGrid) {
+        elements.equityScenariosGrid.innerHTML = multiples.map(m => {
+          const gross = Math.round(totalBaselineEquity * m.mult);
+          const net = Math.round(gross * (1 - taxRate));
+          const isActive = m.mult === activeMult ? "active-scenario" : "";
+          return `
+            <div class="equity-scenario-box ${isActive}">
+              <div class="equity-scenario-tag">${m.label}</div>
+              <div class="equity-scenario-val">${formatCurrency(gross)}</div>
+              <div class="equity-scenario-sub">Net Post-Tax: ${formatCurrency(net)}</div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      const activeGross = Math.round(totalBaselineEquity * activeMult);
+      const taxWithout83b = Math.round(activeGross * 0.37);
+      const taxWith83b = Math.round(activeGross * 0.20);
+      const taxSavings83b = Math.max(0, taxWithout83b - taxWith83b);
+
+      if (elements.equityTaxCallout) {
+        elements.equityTaxCallout.innerHTML = `
+          <strong>💡 83(b) Election &amp; Liquidity Analysis:</strong> At a <strong>${activeMult}x exit</strong> on ${formatCurrency(totalBaselineEquity)} of vested strike equity, your gross payout is <strong>${formatCurrency(activeGross)}</strong>. Filing an 83(b) election at grant locks in Long-Term Capital Gains (20%) vs. Ordinary/AMT rates (37%), saving you <strong>${formatCurrency(taxSavings83b)} in federal taxes</strong> upon exit!
+        `;
+      }
+    } else {
+      // Public RSU Volatility Modeling
+      if (elements.equityMatrixTitle) {
+        elements.equityMatrixTitle.innerHTML = `
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+            <polyline points="16 7 22 7 22 13"></polyline>
+          </svg>
+          Public RSU Stock Volatility &amp; Appreciation Matrix
+        `;
+      }
+      if (elements.equityMatrixBadge) {
+        elements.equityMatrixBadge.textContent = "5-Year Vested RSU Value";
+      }
+
+      const scenarios = [
+        { rate: -0.20, label: "Bear (-20%/yr)" },
+        { rate: 0, label: "Flat (0%/yr)" },
+        { rate: 0.15, label: "Bull (+15%/yr)" },
+        { rate: 0.30, label: "Hypergrowth (+30%)" }
+      ];
+
+      const activeRate = Number(state.equityStockGrowth) || 0;
+
+      if (elements.equityScenariosGrid) {
+        elements.equityScenariosGrid.innerHTML = scenarios.map(s => {
+          let sumVal = 0;
+          for (let y = 1; y <= 5; y++) {
+            sumVal += baseByYear[y - 1] * Math.pow(1 + s.rate, y - 0.5);
+          }
+          const delta = sumVal - totalBaselineEquity;
+          const deltaSign = delta >= 0 ? "+" : "";
+          const isActive = Math.abs(s.rate - activeRate) < 0.001 ? "active-scenario" : "";
+          return `
+            <div class="equity-scenario-box ${isActive}">
+              <div class="equity-scenario-tag">${s.label}</div>
+              <div class="equity-scenario-val">${formatCurrency(Math.round(sumVal))}</div>
+              <div class="equity-scenario-sub">${delta === 0 ? "Grant Baseline" : `${deltaSign}${formatCurrency(Math.round(delta))} vs Flat`}</div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      let activeSum = 0;
+      for (let y = 1; y <= 5; y++) {
+        activeSum += baseByYear[y - 1] * Math.pow(1 + activeRate, y - 0.5);
+      }
+      const swing = Math.round(activeSum - totalBaselineEquity);
+
+      if (elements.equityTaxCallout) {
+        elements.equityTaxCallout.innerHTML = `
+          <strong>📈 RSU Appreciation Impact:</strong> Against a flat grant baseline of <strong>${formatCurrency(Math.round(totalBaselineEquity))}</strong>, a <strong>${(activeRate * 100).toFixed(0)}%/yr</strong> stock trajectory shifts your 5-year vested equity wealth to <strong>${formatCurrency(Math.round(activeSum))}</strong> (${swing >= 0 ? "+" : ""}${formatCurrency(swing)} net variance).
+        `;
+      }
     }
   };
 
@@ -3233,9 +3433,13 @@ Warm regards,
       }
       if (state.enableEquity) {
         params.set("eq", "1");
+        params.set("eqv", state.equityVehicleType || "rsu");
         params.set("eg", Math.round(state.equityInitialGrant));
         params.set("vs", state.equityVestingSchedule);
         params.set("er", Math.round(state.equityRefresherGrant));
+        params.set("eqg", state.equityStockGrowth || 0);
+        params.set("eqm", state.equityExitMultiple !== undefined ? state.equityExitMultiple : 3);
+        params.set("eq83b", state.equity83b ? "1" : "0");
       }
       params.set("sav", state.wealthSavingsRate || 35);
       params.set("ret", state.wealthReturnRate || 0.075);
@@ -3265,9 +3469,13 @@ Warm regards,
     }
     if (state.enableEquity) {
       params.set("eq", "1");
+      params.set("eqv", state.equityVehicleType || "rsu");
       params.set("eg", Math.round(state.equityInitialGrant));
       params.set("vs", state.equityVestingSchedule);
       params.set("er", Math.round(state.equityRefresherGrant));
+      params.set("eqg", state.equityStockGrowth || 0);
+      params.set("eqm", state.equityExitMultiple !== undefined ? state.equityExitMultiple : 3);
+      params.set("eq83b", state.equity83b ? "1" : "0");
     }
     params.set("sav", state.wealthSavingsRate || 35);
     params.set("ret", state.wealthReturnRate || 0.075);
@@ -3520,6 +3728,13 @@ Warm regards,
       if (elements.enableEquityToggle) elements.enableEquityToggle.checked = state.enableEquity;
       if (elements.equityInputsWrap) elements.equityInputsWrap.style.display = state.enableEquity ? "flex" : "none";
       if (elements.equityOptionsPanel) elements.equityOptionsPanel.style.display = state.enableEquity ? "block" : "none";
+      if (params.has("eqv")) {
+        state.equityVehicleType = params.get("eqv") === "startup" ? "startup" : "rsu";
+        if (elements.equityVehicleType) elements.equityVehicleType.value = state.equityVehicleType;
+        const isStartup = state.equityVehicleType === "startup";
+        if (elements.equityStockGrowthGroup) elements.equityStockGrowthGroup.style.display = isStartup ? "none" : "block";
+        if (elements.equityStartupControlsGroup) elements.equityStartupControlsGroup.style.display = isStartup ? "flex" : "none";
+      }
       if (params.has("eg")) {
         state.equityInitialGrant = Number(params.get("eg")) || 160000;
         if (elements.equityInitialGrant) elements.equityInitialGrant.value = state.equityInitialGrant;
@@ -3533,6 +3748,18 @@ Warm regards,
         state.equityRefresherGrant = Number(params.get("er")) || 35000;
         if (elements.equityRefresherGrant) elements.equityRefresherGrant.value = state.equityRefresherGrant;
         if (elements.equityRefresherBadge) elements.equityRefresherBadge.textContent = `${formatCurrency(state.equityRefresherGrant)} / yr`;
+      }
+      if (params.has("eqg")) {
+        state.equityStockGrowth = Number(params.get("eqg")) || 0;
+        if (elements.equityStockGrowth) elements.equityStockGrowth.value = state.equityStockGrowth.toString();
+      }
+      if (params.has("eqm")) {
+        state.equityExitMultiple = Number(params.get("eqm"));
+        if (elements.equityExitMultiple) elements.equityExitMultiple.value = state.equityExitMultiple.toString();
+      }
+      if (params.has("eq83b")) {
+        state.equity83b = params.get("eq83b") === "1";
+        if (elements.equity83bToggle) elements.equity83bToggle.checked = state.equity83b;
       }
       isCustomTrajectory = true;
     }

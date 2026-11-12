@@ -163,7 +163,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.5">
+  <link rel="stylesheet" href="styles.css?v=3.6">
   <style>
     .modal-overlay.open,
     .modal-overlay.active {
@@ -596,6 +596,14 @@
 
                   <div id="equityInputsWrap" style="display: none; flex-direction: column; gap: 1rem;">
                     <div class="form-group">
+                      <label class="form-label" for="equityVehicleType">Equity Vehicle Type</label>
+                      <select id="equityVehicleType" class="form-select">
+                        <option value="rsu" selected>Public Company RSUs (Liquid on Vest)</option>
+                        <option value="startup">Startup Stock Options (ISOs / NSOs)</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
                       <div class="form-label-row">
                         <label class="form-label" for="equityInitialGrant">4-Year Initial Equity Grant ($)</label>
                         <span class="form-badge" id="equityInitialBadge">$160,000</span>
@@ -628,6 +636,35 @@
                       <div style="font-size: 0.75rem; color: var(--slate-text-muted); margin-top: 0.35rem;">
                         Granted annually starting Year 2; stacks on top of initial grant to eliminate Year 4 compensation drop.
                       </div>
+                    </div>
+
+                    <!-- Public RSU Stock Growth Modeling -->
+                    <div class="form-group" id="equityStockGrowthGroup">
+                      <label class="form-label" for="equityStockGrowth">Annual Stock Appreciation / Volatility</label>
+                      <select id="equityStockGrowth" class="form-select">
+                        <option value="-0.20">Bear Market (-20% / yr)</option>
+                        <option value="0" selected>Flat / Baseline (0% / yr)</option>
+                        <option value="0.15">Bull Market (+15% / yr)</option>
+                        <option value="0.30">Hypergrowth / AI Boom (+30% / yr)</option>
+                      </select>
+                    </div>
+
+                    <!-- Startup Stock Options Exit & 83(b) Tax Strategy -->
+                    <div id="equityStartupControlsGroup" style="display: none; flex-direction: column; gap: 0.85rem; background: rgba(37, 99, 235, 0.05); border: 1px solid rgba(37, 99, 235, 0.15); border-radius: var(--radius-md); padding: 0.9rem;">
+                      <div class="form-group" style="margin-bottom: 0;">
+                        <label class="form-label" for="equityExitMultiple">Projected Exit Valuation Multiple</label>
+                        <select id="equityExitMultiple" class="form-select">
+                          <option value="0">Downside / Zero Exit (0x — Underwater)</option>
+                          <option value="1">Flat Acquisition / 1x Preference (1x)</option>
+                          <option value="3" selected>Solid M&amp;A Exit (3x Valuation)</option>
+                          <option value="5">Strong Breakout Exit (5x Valuation)</option>
+                          <option value="10">Unicorn / IPO Outcome (10x Valuation)</option>
+                        </select>
+                      </div>
+                      <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-bottom: 0;">
+                        <input type="checkbox" id="equity83bToggle" checked style="accent-color: #2563EB; width: 16px; height: 16px; cursor: pointer;">
+                        <span style="font-size: 0.8125rem; font-weight: 700; color: var(--navy-dark);">Model 83(b) Early Exercise (LTCG 20% vs 37%)</span>
+                      </label>
                     </div>
                   </div>
                 </div>
@@ -728,6 +765,28 @@
                     <!-- Populated dynamically via app.js -->
                   </tbody>
                 </table>
+              </div>
+
+              <!-- Public RSU & Startup Exit Scenario Matrix -->
+              <div class="equity-matrix-card" id="equityExitMatrixCard" style="display: none;">
+                <div class="equity-matrix-header">
+                  <div class="equity-matrix-title" id="equityMatrixTitle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                      <polyline points="16 7 22 7 22 13"></polyline>
+                    </svg>
+                    Public RSU Volatility &amp; Exit Scenario Matrix
+                  </div>
+                  <div style="font-size: 0.75rem; font-weight: 700; color: #1D4ED8; background: rgba(37, 99, 235, 0.1); padding: 0.25rem 0.65rem; border-radius: var(--radius-pill);" id="equityMatrixBadge">
+                    5-Year Equity Modeling
+                  </div>
+                </div>
+                <div class="equity-scenarios-grid" id="equityScenariosGrid">
+                  <!-- Populated dynamically via app.js -->
+                </div>
+                <div class="equity-tax-callout" id="equityTaxCallout">
+                  <!-- Populated dynamically via app.js -->
+                </div>
               </div>
 
               <!-- Compounding Wealth & FIRE Projector -->
@@ -2129,7 +2188,7 @@
   </footer>
 
   <!-- App Data and Scripts -->
-  <script src="data/careerData.js?v=3.5"></script>
-  <script src="app.js?v=3.5"></script>
+  <script src="data/careerData.js?v=3.6"></script>
+  <script src="app.js?v=3.6"></script>
 </body>
 </html>
