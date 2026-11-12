@@ -225,6 +225,13 @@ document.addEventListener("DOMContentLoaded", () => {
     leadMagnetForm: document.getElementById("leadMagnetForm"),
     leadEmail: document.getElementById("leadEmail"),
 
+    // Report Whitepaper Modal Elements
+    reportModal: document.getElementById("reportModal"),
+    reportModalClose: document.getElementById("reportModalClose"),
+    previewReportBtn: document.getElementById("previewReportBtn"),
+    modalPrintReportBtn: document.getElementById("modalPrintReportBtn"),
+    footerPrintReportBtn: document.getElementById("footerPrintReportBtn"),
+
     toastNotice: document.getElementById("toastNotice"),
     toastMessage: document.getElementById("toastMessage")
   };
@@ -2494,9 +2501,104 @@ Warm regards,
   };
 
   /* ==========================================================================
-     Lead Magnet: 2026 Compensation Report
+     Lead Magnet & 2026 Compensation Report Whitepaper
      ========================================================================== */
   const initLeadMagnet = () => {
+    const openReportModal = () => {
+      if (elements.reportModal) {
+        elements.reportModal.classList.add("open", "active");
+        document.body.style.overflow = "hidden";
+      }
+    };
+
+    const closeReportModal = () => {
+      if (elements.reportModal) {
+        elements.reportModal.classList.remove("open", "active");
+        document.body.style.overflow = "";
+      }
+    };
+
+    const printBenchmarkReport = () => {
+      const modalBody = elements.reportModal ? elements.reportModal.querySelector(".modal-body") : null;
+      const content = modalBody ? modalBody.innerHTML : "";
+      const printWindow = window.open("", "_blank", "width=900,height=900");
+      if (!printWindow) {
+        window.print();
+        return;
+      }
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>2026 Executive Compensation Benchmark Report — SalaryPathGuide</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #0F172A; padding: 2rem; margin: 0; line-height: 1.5; font-size: 10pt; background: #FFFFFF; }
+            .report-header-banner { background: #0A1128 !important; color: #FFFFFF !important; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .report-header-badge { font-size: 8pt; font-weight: bold; color: #10B981 !important; text-transform: uppercase; margin-bottom: 0.5rem; }
+            .report-title { font-size: 16pt; font-weight: 800; color: #FFFFFF !important; margin: 0 0 0.5rem 0; }
+            .report-meta-row { display: flex; gap: 1.5rem; font-size: 8pt; color: #CBD5E1 !important; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 0.5rem; margin-top: 0.75rem; }
+            .report-section-block { border: 1px solid #CBD5E1; border-radius: 8px; padding: 1.25rem; margin-bottom: 1.5rem; page-break-inside: avoid; }
+            .report-section-title { font-size: 12pt; font-weight: 800; color: #0A1128; margin: 0 0 0.75rem 0; }
+            .report-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-top: 0.5rem; }
+            .report-table th { background: #F1F5F9 !important; color: #0A1128; text-align: left; padding: 6px 8px; border-bottom: 2px solid #CBD5E1; font-size: 7.5pt; text-transform: uppercase; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .report-table td { padding: 6px 8px; border-bottom: 1px solid #E2E8F0; }
+            .report-keypoints { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+            .report-keypoint-item { background: #F8FAFC !important; border-left: 3px solid #10B981 !important; padding: 0.75rem; border-radius: 4px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .report-keypoint-item h5 { margin: 0 0 0.25rem 0; font-size: 9pt; color: #0A1128; font-weight: 700; }
+            .report-keypoint-item p { margin: 0; font-size: 8pt; color: #475569; }
+            .print-footer { text-align: center; margin-top: 2rem; font-size: 8pt; color: #64748B; border-top: 1px solid #E2E8F0; padding-top: 1rem; }
+            @page { margin: 1.5cm; size: auto; }
+          </style>
+        </head>
+        <body>
+          ${content}
+          <div class="print-footer">
+            &copy; 2026 SalaryPathGuide.com &bull; Confidential Executive Compensation Benchmark Whitepaper &bull; Generated from live verified dataset
+          </div>
+          <script>
+            window.onload = function() {
+              window.print();
+            };
+          <\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    };
+
+    // Trigger buttons
+    if (elements.previewReportBtn) {
+      elements.previewReportBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        openReportModal();
+      });
+    }
+
+    if (elements.modalPrintReportBtn) {
+      elements.modalPrintReportBtn.addEventListener("click", printBenchmarkReport);
+    }
+    if (elements.footerPrintReportBtn) {
+      elements.footerPrintReportBtn.addEventListener("click", printBenchmarkReport);
+    }
+
+    if (elements.reportModalClose) {
+      elements.reportModalClose.addEventListener("click", closeReportModal);
+    }
+
+    if (elements.reportModal) {
+      elements.reportModal.addEventListener("click", (e) => {
+        if (e.target === elements.reportModal) {
+          closeReportModal();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && elements.reportModal.classList.contains("open")) {
+          closeReportModal();
+        }
+      });
+    }
+
     if (!elements.leadMagnetForm) return;
 
     elements.leadMagnetForm.addEventListener("submit", (e) => {
@@ -2530,7 +2632,8 @@ Warm regards,
         } catch (err) {}
       }
 
-      showToast("🎉 2026 Executive Compensation Report has been sent to " + email);
+      showToast("🎉 Opening your 2026 Executive Compensation Whitepaper...");
+      openReportModal();
       elements.leadMagnetForm.reset();
     });
   };
