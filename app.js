@@ -3785,14 +3785,68 @@ Warm regards,
   };
 
   /* ==========================================================================
-     Service Worker Registration for PWA
+     Service Worker Registration & Installable PWA Engine
      ========================================================================== */
   const registerServiceWorker = () => {
+    const pwaStatusBadge = document.getElementById("pwaStatusBadge");
+    const pwaInstallBtn = document.getElementById("pwaInstallBtn");
+    let deferredPrompt = null;
+
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js").catch(() => {});
+        navigator.serviceWorker.register("/sw.js").then((reg) => {
+          if (pwaStatusBadge) {
+            pwaStatusBadge.textContent = navigator.onLine ? "⚡ Offline-Ready PWA (Active)" : "📡 Offline Mode (Cached)";
+          }
+          reg.addEventListener("updatefound", () => {
+            const newWorker = reg.installing;
+            if (newWorker) {
+              newWorker.addEventListener("statechange", () => {
+                if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                  showToast("🔄 New SalaryPathGuide version cached for offline use!");
+                }
+              });
+            }
+          });
+        }).catch(() => {});
       });
     }
+
+    window.addEventListener("online", () => {
+      if (pwaStatusBadge) pwaStatusBadge.textContent = "⚡ Offline-Ready PWA (Active)";
+      showToast("🌐 Back online!");
+    });
+
+    window.addEventListener("offline", () => {
+      if (pwaStatusBadge) pwaStatusBadge.textContent = "📡 Offline Mode (Cached)";
+      showToast("📡 You are offline — SalaryPathGuide continues running from cache.");
+    });
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (pwaInstallBtn) {
+        pwaInstallBtn.style.display = "inline-flex";
+      }
+    });
+
+    if (pwaInstallBtn) {
+      pwaInstallBtn.addEventListener("click", async () => {
+        if (!deferredPrompt) return;
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === "accepted") {
+          showToast("📲 SalaryPathGuide installed to your device!");
+          pwaInstallBtn.style.display = "none";
+        }
+        deferredPrompt = null;
+      });
+    }
+
+    window.addEventListener("appinstalled", () => {
+      deferredPrompt = null;
+      if (pwaInstallBtn) pwaInstallBtn.style.display = "none";
+    });
   };
 
   /* ==========================================================================

@@ -1,11 +1,53 @@
 {
+  "id": "/",
   "name": "SalaryPathGuide — Career Compensation Intelligence & Trajectory Engine",
   "short_name": "SalaryPath",
   "description": "Interactive career compensation modeler, 5-year salary trajectory visualizer, cross-company leveling matrix, and offer negotiation counter-proposal generator.",
-  "start_url": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0A1128",
   "theme_color": "#0A1128",
   "orientation": "any",
-  "categories": ["finance", "business", "productivity"]
+  "categories": ["finance", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "5-Year Trajectory Calculator",
+      "short_name": "Calculator",
+      "url": "/#calculator",
+      "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Written Offer Evaluator",
+      "short_name": "Offer Eval",
+      "url": "/#offer-evaluator",
+      "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Negotiation Roleplay Coach",
+      "short_name": "Negotiate",
+      "url": "/#negotiation",
+      "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
 }

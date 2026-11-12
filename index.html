@@ -32,6 +32,8 @@
 
   <!-- PWA & Mobile Web App Meta -->
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="/assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
   <meta name="theme-color" content="#0A1128">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -161,7 +163,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.4">
+  <link rel="stylesheet" href="styles.css?v=3.5">
   <style>
     .modal-overlay.open,
     .modal-overlay.active {
@@ -2113,13 +2115,21 @@
 
       <div class="footer-bottom">
         <div>&copy; 2026 SalaryPathGuide.com. All rights reserved. Built for engineering and tech leaders.</div>
-        <div>Fintech Grade Compensation Analytics &bull; Domain: SalaryPathGuide.com</div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <span id="pwaStatusBadge" style="font-size: 0.75rem; font-weight: 600; color: var(--emerald-primary); display: inline-flex; align-items: center; gap: 0.35rem;">
+            ⚡ Offline-Ready PWA
+          </span>
+          <button type="button" id="pwaInstallBtn" class="btn btn-emerald btn-sm" style="display: none; padding: 0.25rem 0.65rem; font-size: 0.75rem;">
+            📲 Install App
+          </button>
+          <span>Fintech Grade Compensation Analytics &bull; Domain: SalaryPathGuide.com</span>
+        </div>
       </div>
     </div>
   </footer>
 
   <!-- App Data and Scripts -->
-  <script src="data/careerData.js?v=3.4"></script>
-  <script src="app.js?v=3.4"></script>
+  <script src="data/careerData.js?v=3.5"></script>
+  <script src="app.js?v=3.5"></script>
 </body>
 </html>
