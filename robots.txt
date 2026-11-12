@@ -1,0 +1,8 @@
+# https://www.robotstxt.org/robotstxt.html
+# SalaryPathGuide - Career Compensation Intelligence & Trajectory Engine
+User-agent: *
+Allow: /
+
+# Host & Sitemap
+Host: https://salarypathguide.com
+Sitemap: https://salarypathguide.com/sitemap.xml
