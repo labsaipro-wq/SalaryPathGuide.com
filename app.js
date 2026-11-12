@@ -44,6 +44,10 @@ document.addEventListener("DOMContentLoaded", () => {
     equityVestingSchedule: "standard",
     equityRefresherGrant: 35000,
     currentTrajectoryData: [],
+    // Compounding Wealth & FIRE Projector
+    wealthSavingsRate: 35,
+    wealthReturnRate: 0.075,
+    wealthStartingNetWorth: 50000,
     // Script customizer defaults
     scriptCompany: "Acme Cloud",
     scriptTargetBase: 165000,
@@ -116,6 +120,18 @@ document.addEventListener("DOMContentLoaded", () => {
     kpiPromoAdvantage: document.getElementById("kpiPromoAdvantage"),
     progressionTableBody: document.getElementById("progressionTableBody"),
     chartCanvas: document.getElementById("trajectoryChart"),
+
+    // Compounding Wealth & FIRE Projector
+    wealthY5Invested: document.getElementById("wealthY5Invested"),
+    wealthTimeToOneMil: document.getElementById("wealthTimeToOneMil"),
+    wealthTimeToFire: document.getElementById("wealthTimeToFire"),
+    wealthSavingsRate: document.getElementById("wealthSavingsRate"),
+    wealthSavingsBadge: document.getElementById("wealthSavingsBadge"),
+    wealthReturnRate: document.getElementById("wealthReturnRate"),
+    wealthStartingNetWorth: document.getElementById("wealthStartingNetWorth"),
+    wealthFireBar: document.getElementById("wealthFireBar"),
+    wealthFireProgressPct: document.getElementById("wealthFireProgressPct"),
+    wealthInsightCallout: document.getElementById("wealthInsightCallout"),
 
     // Offer Evaluator
     evalRoleSelect: document.getElementById("evalRoleSelect"),
@@ -567,8 +583,15 @@ document.addEventListener("DOMContentLoaded", () => {
       state.bonusPct = 10;
       state.calcLocationMultiplier = 1.00;
       state.adjustForInflation = false;
+      state.wealthSavingsRate = 35;
+      state.wealthReturnRate = 0.075;
+      state.wealthStartingNetWorth = 50000;
 
       if (elements.calcInflationToggle) elements.calcInflationToggle.checked = false;
+      if (elements.wealthSavingsRate) elements.wealthSavingsRate.value = 35;
+      if (elements.wealthSavingsBadge) elements.wealthSavingsBadge.textContent = "35%";
+      if (elements.wealthReturnRate) elements.wealthReturnRate.value = "0.075";
+      if (elements.wealthStartingNetWorth) elements.wealthStartingNetWorth.value = 50000;
       elements.calcJobTitle.value = "swe";
       elements.calcTrackBadge.textContent = "Engineering";
       elements.calcAnnualRaise.value = 4;
@@ -708,6 +731,31 @@ document.addEventListener("DOMContentLoaded", () => {
       elements.equityRefresherGrant.addEventListener("input", (e) => {
         state.equityRefresherGrant = Math.max(0, Number(e.target.value) || 0);
         if (elements.equityRefresherBadge) elements.equityRefresherBadge.textContent = `${formatCurrency(state.equityRefresherGrant)} / yr`;
+        runTrajectoryCalculations();
+      });
+    }
+
+    // Compounding Wealth & FIRE Projector inputs
+    if (elements.wealthSavingsRate) {
+      elements.wealthSavingsRate.addEventListener("input", (e) => {
+        state.wealthSavingsRate = Number(e.target.value);
+        if (elements.wealthSavingsBadge) {
+          elements.wealthSavingsBadge.textContent = `${state.wealthSavingsRate}%`;
+        }
+        runTrajectoryCalculations();
+      });
+    }
+
+    if (elements.wealthReturnRate) {
+      elements.wealthReturnRate.addEventListener("change", (e) => {
+        state.wealthReturnRate = Number(e.target.value);
+        runTrajectoryCalculations();
+      });
+    }
+
+    if (elements.wealthStartingNetWorth) {
+      elements.wealthStartingNetWorth.addEventListener("input", (e) => {
+        state.wealthStartingNetWorth = Math.max(0, Number(e.target.value) || 0);
         runTrajectoryCalculations();
       });
     }
@@ -879,6 +927,76 @@ document.addEventListener("DOMContentLoaded", () => {
       yearsTo2M = Math.max(1, Math.min(35, yearsTo2M)).toFixed(1);
 
       elements.fireMilestoneText.innerHTML = `At a 35% household savings rate (${formatCurrency(annualSavings)}/yr invested @ 7%), projected to reach <strong>$1,000,000</strong> in liquid wealth in <strong>~${yearsTo1M} years</strong> (and $2,000,000 in ~${yearsTo2M} years)!`;
+    }
+
+    // Compounding Wealth & FIRE Projector Calculation
+    if (elements.wealthY5Invested) {
+      let portfolio = Number(state.wealthStartingNetWorth) || 0;
+      const sRate = (Number(state.wealthSavingsRate) || 35) / 100;
+      const rRate = Number(state.wealthReturnRate) || 0.075;
+
+      for (let y = 1; y <= 5; y++) {
+        const annualComp = yearData[y - 1].totalAnnualComp;
+        const annualSavings = annualComp * sRate;
+        // Continuous mid-year dollar-cost averaging model:
+        portfolio = portfolio * (1 + rRate) + annualSavings * (1 + rRate / 2);
+      }
+
+      const avgAnnualSavings = (total5YrEarnings / 5) * sRate;
+      const startPort = Number(state.wealthStartingNetWorth) || 0;
+
+      const calcYearsToMilestone = (targetAmount) => {
+        if (startPort >= targetAmount) return 0;
+        if (avgAnnualSavings <= 0 && startPort <= 0) return 99;
+        const numerator = targetAmount * rRate + avgAnnualSavings;
+        const denominator = startPort * rRate + avgAnnualSavings;
+        if (denominator <= 0 || numerator <= 0) return 99;
+        const yrs = Math.log(numerator / denominator) / Math.log(1 + rRate);
+        return Math.max(0, yrs);
+      };
+
+      const yrsTo1M = calcYearsToMilestone(1000000);
+      const yrsToFire = calcYearsToMilestone(2000000);
+
+      elements.wealthY5Invested.textContent = formatCurrency(Math.round(portfolio));
+      elements.wealthTimeToOneMil.textContent = yrsTo1M <= 0 ? "Achieved! 🏆" : (yrsTo1M >= 40 ? "40+ Yrs" : `~${yrsTo1M.toFixed(1)} Yrs`);
+      elements.wealthTimeToFire.textContent = yrsToFire <= 0 ? "FIRE Freedom! 🚀" : (yrsToFire >= 50 ? "50+ Yrs" : `~${yrsToFire.toFixed(1)} Yrs`);
+
+      // Progress bar towards Full FIRE ($2.0M target)
+      const fireTarget = 2000000;
+      const progressPct = Math.min(100, Math.max(0, Math.round((portfolio / fireTarget) * 100)));
+      if (elements.wealthFireBar) {
+        elements.wealthFireBar.style.width = `${progressPct}%`;
+      }
+      if (elements.wealthFireProgressPct) {
+        if (portfolio >= fireTarget) {
+          elements.wealthFireProgressPct.textContent = `100% — Full FIRE Reached ($2.0M+)! 🎯`;
+        } else {
+          elements.wealthFireProgressPct.textContent = `${progressPct}% of Full FIRE ($2.0M)`;
+        }
+      }
+
+      // Dynamic Institutional Wealth Insight
+      if (elements.wealthInsightCallout) {
+        const annualPassiveIncome = Math.round(portfolio * 0.04);
+        const monthlyPassiveIncome = Math.round(annualPassiveIncome / 12);
+
+        let milestoneNote = "";
+        if (yrsTo1M <= 5) {
+          milestoneNote = `On this trajectory, you will cross the <strong>$1,000,000 liquid milestone within Year ${Math.ceil(yrsTo1M)}</strong>!`;
+        } else {
+          const acceleratedSavings = avgAnnualSavings + (total5YrEarnings / 5) * 0.10;
+          const numAcc = 2000000 * rRate + acceleratedSavings;
+          const denAcc = startPort * rRate + acceleratedSavings;
+          const acceleratedYrs = Math.max(0, Math.log(numAcc / denAcc) / Math.log(1 + rRate));
+          const yearsSaved = Math.max(0.5, yrsToFire - acceleratedYrs).toFixed(1);
+          milestoneNote = `Reaching $1.0M in ~${yrsTo1M.toFixed(1)} yrs. Boosting your savings rate by +10% would shave <strong>${yearsSaved} years</strong> off your full FIRE timeline!`;
+        }
+
+        elements.wealthInsightCallout.innerHTML = `
+          <strong>💡 Institutional Wealth Projection:</strong> By Year 5, your projected portfolio of <strong>${formatCurrency(Math.round(portfolio))}</strong> generates <strong>${formatCurrency(annualPassiveIncome)}/year</strong> (${formatCurrency(monthlyPassiveIncome)}/month) in perpetual passive income under the Trinity 4% Safe Withdrawal Rule. ${milestoneNote}
+        `;
+      }
     }
 
     // Render Progression Table
@@ -1107,6 +1225,8 @@ document.addEventListener("DOMContentLoaded", () => {
       `5-Year Total Projected Earnings: ${totalEarnings}`,
       `Compounded Growth: ${growth} (${endingBase})`,
       `Promotion Value Added: ${promoAdvantage}`,
+      elements.wealthY5Invested ? `5-Year Projected Invested Wealth: ${elements.wealthY5Invested.textContent} (${state.wealthSavingsRate}% savings @ ${(state.wealthReturnRate * 100).toFixed(1)}% real return)` : "",
+      elements.wealthTimeToFire ? `Full FIRE Horizon: ${elements.wealthTimeToFire.textContent}` : "",
       `Mode: ${state.adjustForInflation ? "Real (Inflation-Adjusted @ 2.8%/yr)" : "Nominal"}`,
       `Benchmark verified at SalaryPathGuide.com`
     ].join("\n");
