@@ -4192,6 +4192,67 @@ Warm regards,
     });
   };
 
+  const initTrustModal = () => {
+    const modal = document.getElementById("trustModal");
+    const titleEl = document.getElementById("trustModalTitle");
+    const bodyEl = document.getElementById("trustModalBody");
+    const closeBtn = document.getElementById("trustModalClose");
+    if (!modal || !titleEl || !bodyEl) return;
+
+    const copyMap = {
+      privacy: {
+        title: "Privacy Policy (100% Client-Side)",
+        html: `
+          <p style="margin-bottom:0.85rem;"><strong>Zero Server Tracking of Your Salary Inputs:</strong> All 5-year trajectory calculations, offer evaluations, equity exit models, and FIRE projections execute 100% locally in your browser.</p>
+          <p style="margin-bottom:0.85rem;"><strong>Local Storage &amp; URL Sharing:</strong> Saved preferences remain in your browser. Shared trajectory links encode parameters strictly in the URL query string when you explicitly click <em>Share Trajectory</em>.</p>
+          <p><strong>Anonymous Compensation Submissions:</strong> Offer submissions strip personally identifiable fields and are aggregated solely for market percentile benchmarking.</p>
+        `
+      },
+      terms: {
+        title: "Terms of Service & Benchmark Disclaimer",
+        html: `
+          <p style="margin-bottom:0.85rem;"><strong>Educational &amp; Modeling Use:</strong> SalaryPathGuide provides compensation benchmarks, tax estimates, and equity exit simulations for informational and negotiation planning purposes only.</p>
+          <p style="margin-bottom:0.85rem;"><strong>Not Financial, Legal, or Tax Advice:</strong> Always consult a licensed CPA or attorney before making 83(b) elections, AMT/ISO exercise decisions, or employment contract commitments.</p>
+          <p><strong>Data Accuracy:</strong> Market bands are calibrated quarterly against 2025–2026 tech, healthcare, legal, and finance benchmarks.</p>
+        `
+      },
+      contact: {
+        title: "Contact Editorial & Benchmark Team",
+        html: `
+          <p style="margin-bottom:0.85rem;">Have a 2026 compensation band update, corporate leveling mapping correction, or partnership inquiry?</p>
+          <p style="margin-bottom:1rem;">Reach our editorial team directly at <a href="mailto:editorial@salarypathguide.com" style="color:var(--emerald-dark);font-weight:700;text-decoration:underline;">editorial@salarypathguide.com</a>, or contribute an anonymous verified package below.</p>
+          <button type="button" class="btn btn-emerald btn-sm" id="trustOpenSubmitBtn">+ Submit Anonymous Offer Data</button>
+        `
+      }
+    };
+
+    document.querySelectorAll("[data-trust]").forEach(link => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const key = link.getAttribute("data-trust");
+        const entry = copyMap[key] || copyMap.privacy;
+        titleEl.textContent = entry.title;
+        bodyEl.innerHTML = entry.html;
+        const submitTrigger = document.getElementById("trustOpenSubmitBtn");
+        if (submitTrigger) {
+          submitTrigger.addEventListener("click", () => {
+            modal.classList.remove("open", "active");
+            const subModal = document.getElementById("submitOfferModal");
+            if (subModal) subModal.classList.add("open", "active");
+          });
+        }
+        modal.classList.add("open", "active");
+      });
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener("click", () => modal.classList.remove("open", "active"));
+    }
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.classList.remove("open", "active");
+    });
+  };
+
   /* ==========================================================================
      Bootstrap Application
      ========================================================================== */
@@ -4212,5 +4273,6 @@ Warm regards,
   initUrlStateLoader();
   initShareModalListeners();
   initAccessibleModals();
+  initTrustModal();
   registerServiceWorker();
 });

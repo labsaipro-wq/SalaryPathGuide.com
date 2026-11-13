@@ -329,7 +329,7 @@
             <div class="hero-metric-label">Avg. Promotion Leap</div>
           </div>
           <div class="hero-metric-card">
-            <div class="hero-metric-val">14 Tracks</div>
+            <div class="hero-metric-val">18 Tracks</div>
             <div class="hero-metric-label">Healthcare, Tech &amp; Finance</div>
           </div>
           <div class="hero-metric-card">
@@ -2172,9 +2172,9 @@
           <ul class="footer-links">
             <li><a href="#hero">Methodology &amp; Data Sources</a></li>
             <li><a href="#resources">Affiliate Disclosure</a></li>
-            <li><a href="#">Privacy Policy</a></li>
-            <li><a href="#">Terms of Service</a></li>
-            <li><a href="#">Contact Editorial Team</a></li>
+            <li><a href="#trust" id="footerPrivacyTrigger" data-trust="privacy">Privacy Policy</a></li>
+            <li><a href="#trust" id="footerTermsTrigger" data-trust="terms">Terms of Service</a></li>
+            <li><a href="#trust" id="footerContactTrigger" data-trust="contact">Contact Editorial Team</a></li>
           </ul>
         </div>
       </div>
@@ -2194,8 +2194,20 @@
     </div>
   </footer>
 
+  <!-- Trust / Privacy / Terms / Contact Modal -->
+  <div class="modal-overlay" id="trustModal" role="dialog" aria-modal="true" aria-labelledby="trustModalTitle">
+    <div class="modal-container" style="max-width: 640px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="trustModalTitle">Privacy &amp; Editorial Trust</h3>
+        <button class="modal-close-btn" id="trustModalClose" aria-label="Close trust modal">✕</button>
+      </div>
+      <div class="modal-body" id="trustModalBody" style="line-height: 1.65; color: var(--slate-text-main); font-size: 0.9375rem;">
+      </div>
+    </div>
+  </div>
+
   <!-- App Data and Scripts -->
   <script src="data/careerData.js?v=3.7"></script>
-  <script src="app.js?v=4.0"></script>
+  <script src="app.js?v=4.1"></script>
 </body>
 </html>
