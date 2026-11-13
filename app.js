@@ -2748,12 +2748,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Mobile hamburger menu toggle
     elements.mobileMenuBtn.addEventListener("click", () => {
-      elements.mobileDrawer.classList.toggle("hidden");
+      const isHidden = elements.mobileDrawer.classList.toggle("hidden");
+      elements.mobileMenuBtn.setAttribute("aria-expanded", String(!isHidden));
     });
 
     elements.mobileDrawer.querySelectorAll(".nav-link").forEach(link => {
       link.addEventListener("click", () => {
         elements.mobileDrawer.classList.add("hidden");
+        elements.mobileMenuBtn.setAttribute("aria-expanded", "false");
       });
     });
 
@@ -4101,6 +4103,94 @@ Warm regards,
   };
 
   /* ==========================================================================
+     Accessible Modal Focus Trap & Keyboard Navigation Controller
+     ========================================================================== */
+  const initAccessibleModals = () => {
+    const focusableSelector = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    let lastTriggerEl = null;
+
+    const getOpenModal = () => document.querySelector(".modal-overlay.open, .modal-overlay.active");
+
+    const getFocusableInside = (container) => {
+      return Array.from(container.querySelectorAll(focusableSelector)).filter(
+        el => el.offsetParent !== null || el === document.activeElement
+      );
+    };
+
+    const closeAllModals = () => {
+      document.querySelectorAll(".modal-overlay.open, .modal-overlay.active").forEach(modal => {
+        modal.classList.remove("open", "active");
+      });
+      if (lastTriggerEl && typeof lastTriggerEl.focus === "function") {
+        lastTriggerEl.focus();
+        lastTriggerEl = null;
+      }
+    };
+
+    document.querySelectorAll(".modal-overlay").forEach(modal => {
+      let wasOpen = modal.classList.contains("open") || modal.classList.contains("active");
+      const observer = new MutationObserver(() => {
+        const isOpen = modal.classList.contains("open") || modal.classList.contains("active");
+        if (isOpen && !wasOpen) {
+          wasOpen = true;
+          if (document.activeElement && !modal.contains(document.activeElement)) {
+            lastTriggerEl = document.activeElement;
+          }
+          requestAnimationFrame(() => {
+            const focusables = getFocusableInside(modal);
+            if (focusables.length > 0) focusables[0].focus();
+          });
+        } else if (!isOpen && wasOpen) {
+          wasOpen = false;
+          if (!getOpenModal() && lastTriggerEl && typeof lastTriggerEl.focus === "function") {
+            lastTriggerEl.focus();
+            lastTriggerEl = null;
+          }
+        }
+      });
+      observer.observe(modal, { attributes: true, attributeFilter: ["class"] });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const openModal = getOpenModal();
+        if (openModal) {
+          e.preventDefault();
+          closeAllModals();
+          return;
+        }
+        if (elements.mobileDrawer && !elements.mobileDrawer.classList.contains("hidden")) {
+          elements.mobileDrawer.classList.add("hidden");
+          if (elements.mobileMenuBtn) {
+            elements.mobileMenuBtn.setAttribute("aria-expanded", "false");
+            elements.mobileMenuBtn.focus();
+          }
+        }
+        return;
+      }
+
+      if (e.key === "Tab") {
+        const openModal = getOpenModal();
+        if (!openModal) return;
+        const focusables = getFocusableInside(openModal);
+        if (focusables.length === 0) return;
+        const firstEl = focusables[0];
+        const lastEl = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstEl || !openModal.contains(document.activeElement)) {
+            e.preventDefault();
+            lastEl.focus();
+          }
+        } else if (document.activeElement === lastEl || !openModal.contains(document.activeElement)) {
+          e.preventDefault();
+          firstEl.focus();
+        }
+      }
+    });
+  };
+
+  /* ==========================================================================
      Bootstrap Application
      ========================================================================== */
   initSearch();
@@ -4119,5 +4209,6 @@ Warm regards,
   initNavigation();
   initUrlStateLoader();
   initShareModalListeners();
+  initAccessibleModals();
   registerServiceWorker();
 });

@@ -168,7 +168,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=3.8">
+  <link rel="stylesheet" href="styles.css?v=3.9">
   <style>
     .modal-overlay.open,
     .modal-overlay.active {
@@ -179,6 +179,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <a href="#hero" class="skip-link">Skip to main content</a>
 
   <!-- Top Navigation Bar -->
   <header class="navbar" id="navbar">
@@ -227,7 +228,7 @@
           Compare Bands
         </button>
         <a href="#calculator" class="btn btn-emerald btn-sm">Calculate</a>
-        <button class="nav-mobile-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation Menu">
+        <button class="nav-mobile-toggle" id="mobileMenuBtn" aria-label="Toggle Navigation Menu" aria-expanded="false" aria-controls="mobileDrawer">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"></line>
             <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -239,7 +240,7 @@
   </header>
 
   <!-- Mobile Drawer Menu -->
-  <div class="mobile-drawer hidden" id="mobileDrawer">
+  <div class="mobile-drawer hidden" id="mobileDrawer" role="navigation" aria-label="Mobile Navigation">
     <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.08);">
       <span style="font-size: 0.8125rem; color: #94A3B8; font-weight: 600;">Currency:</span>
       <select id="mobileCurrencySelector" class="form-select btn-sm currency-select" style="width: auto;">
@@ -2194,6 +2195,6 @@
 
   <!-- App Data and Scripts -->
   <script src="data/careerData.js?v=3.6"></script>
-  <script src="app.js?v=3.8"></script>
+  <script src="app.js?v=3.9"></script>
 </body>
 </html>
