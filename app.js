@@ -3483,9 +3483,32 @@ Warm regards,
     return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
   };
 
+  const updateDynamicSeoMeta = (shareUrlOverride) => {
+    const role = roles.find(r => r.id === state.selectedRoleId) || roles[0];
+    const totalStr = elements.kpiTotalEarnings ? elements.kpiTotalEarnings.textContent : formatCurrency(state.currentBaseSalary * 5);
+    const startStr = formatCurrency(state.currentBaseSalary);
+    const title = `${role.title} 5-Year Trajectory (${totalStr} Total) | SalaryPathGuide`;
+    const desc = `Interactive 5-year compensation model for ${role.title} starting at ${startStr} base${state.enableEquity ? " with equity & exit scenarios" : ""}. Projected 5-year cumulative comp: ${totalStr}.`;
+    const activeUrl = shareUrlOverride || window.location.href;
+
+    document.title = title;
+    const setMeta = (selector, attr, val) => {
+      const el = document.querySelector(selector);
+      if (el) el.setAttribute(attr, val);
+    };
+    setMeta('meta[name="description"]', "content", desc);
+    setMeta('meta[property="og:title"]', "content", title);
+    setMeta('meta[property="og:description"]', "content", desc);
+    setMeta('meta[property="og:url"]', "content", activeUrl);
+    setMeta('meta[name="twitter:title"]', "content", title);
+    setMeta('meta[name="twitter:description"]', "content", desc);
+    setMeta('meta[name="twitter:url"]', "content", activeUrl);
+  };
+
   const shareTrajectoryLink = () => {
     const shareUrl = getTrajectoryShareUrl();
     window.history.replaceState({}, "", shareUrl);
+    updateDynamicSeoMeta(shareUrl);
 
     const role = roles.find(r => r.id === state.selectedRoleId) || roles[0];
     if (elements.shareModalTitle) {
@@ -3810,6 +3833,7 @@ Warm regards,
     }
 
     runTrajectoryCalculations();
+    if (isCustomTrajectory) updateDynamicSeoMeta(window.location.href);
 
     // Show Shared Scenario Banner if customized trajectory params present
     if (isCustomTrajectory && elements.sharedScenarioBanner) {
