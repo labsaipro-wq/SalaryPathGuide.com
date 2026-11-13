@@ -118,6 +118,7 @@ function renderFooter(roles) {
             <li><a href="/tools/83b-election-calculator/">83(b) &amp; Startup Exit Matrix</a></li>
             <li><a href="/tools/fire-compensation-projector/">FIRE Wealth Projector</a></li>
             <li><a href="/tools/geo-arbitrage-calculator/">Geo-Arbitrage Calculator</a></li>
+            <li><a href="/reports/2026-compensation-report/">2026 Compensation &amp; Cliff Report</a></li>
             <li><a href="/#calculator">Interactive 5-Year Calculator</a></li>
           </ul>
         </div>
@@ -850,6 +851,135 @@ function renderComparePage(cmp, allRoles) {
 </html>`;
 }
 
+function renderReportPage(roles) {
+  const canonicalUrl = `${SITE_URL}/reports/2026-compensation-report/`;
+  const title = "2026 Compensation, Equity & Sign-On Cliff Data Report | SalaryPathGuide";
+  const description = "Original 2026 benchmark analysis across 18 tech, AI, healthcare, legal, and finance tracks: MLOps +28.4% YoY growth, Year-2 sign-on cliffs, 83(b) tax savings, and zero-tax state geo-arbitrage.";
+
+  const rowsHtml = roles
+    .map((r) => {
+      const slug = slugify(r.title);
+      const entry = r.levels[0];
+      const senior = r.levels[Math.min(2, r.levels.length - 1)];
+      const top = r.levels[r.levels.length - 1];
+      const entryTc = entry.base.p50 * (1 + entry.bonusPct / 100) + entry.equityAnnual;
+      const seniorTc = senior.base.p50 * (1 + senior.bonusPct / 100) + senior.equityAnnual;
+      const topTc = top.base.p50 * (1 + top.bonusPct / 100) + top.equityAnnual;
+      return `
+              <tr>
+                <td><a href="/salaries/${slug}/" style="font-weight:700;color:var(--navy-dark);text-decoration:underline;">${escapeHtml(r.title)}</a></td>
+                <td>${escapeHtml(r.category)}</td>
+                <td class="mono" style="color:var(--emerald-dark);font-weight:700;">${escapeHtml(r.marketGrowth)}</td>
+                <td class="mono">${fmtUsd(entryTc)}</td>
+                <td class="mono"><strong>${fmtUsd(seniorTc)}</strong></td>
+                <td class="mono table-total">${fmtUsd(topTc)}</td>
+              </tr>`;
+    })
+    .join("");
+
+  const schemaGraph = [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+        { "@type": "ListItem", position: 2, name: "2026 Compensation & Cliff Report", item: canonicalUrl }
+      ]
+    },
+    {
+      "@type": "Article",
+      headline: title,
+      description,
+      datePublished: TODAY,
+      dateModified: TODAY,
+      author: { "@type": "Organization", name: "SalaryPathGuide" },
+      publisher: { "@type": "Organization", name: "SalaryPathGuide" },
+      image: `${SITE_URL}/assets/og-card.jpg`
+    }
+  ];
+
+  return `${renderHead({ title, description, canonicalUrl, schemaGraph })}
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  ${renderNavbar()}
+
+  <main id="main-content">
+    <section class="hero-section" style="padding: 4rem 0 3.25rem;">
+      <div class="hero-glow"></div>
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-badge"><span class="pulse-dot"></span> Annual Data Study &bull; Published ${TODAY}</div>
+          <h1 class="hero-title" style="font-size:clamp(2rem,4vw,3.15rem);">2026 Compensation &amp; <span>Sign-On Cliff Report</span></h1>
+          <p class="hero-subtitle" style="margin-bottom:2rem;">Cross-industry benchmark findings across 18 career tracks, 5 equity vesting structures, and 6 major compensation metros.</p>
+          <div style="display:flex;justify-content:center;gap:0.85rem;flex-wrap:wrap;">
+            <a href="/#calculator" class="btn btn-emerald btn-lg">Model Your 5-Year Trajectory &rarr;</a>
+            <a href="/#offer-evaluator" class="btn btn-outline-white btn-lg">Test Your Offer for Cliffs</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-slate">
+      <div class="container">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem;margin-bottom:2.5rem;">
+          <div style="background:#FFFFFF;border:1px solid var(--slate-border);border-radius:var(--radius-lg);padding:1.5rem;">
+            <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--emerald-dark);margin-bottom:0.4rem;">Finding #1 &bull; AI Infra Surge</div>
+            <div class="mono" style="font-size:1.75rem;font-weight:800;color:var(--navy-dark);margin-bottom:0.35rem;">+28.4% YoY</div>
+            <p style="font-size:0.9rem;color:var(--slate-text-muted);">ML Platform / MLOps Engineers lead 2026 base &amp; equity growth, with Senior L5 median total comp reaching $357,250.</p>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid var(--slate-border);border-radius:var(--radius-lg);padding:1.5rem;">
+            <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--emerald-dark);margin-bottom:0.4rem;">Finding #2 &bull; Vesting Cliffs</div>
+            <div class="mono" style="font-size:1.75rem;font-weight:800;color:var(--navy-dark);margin-bottom:0.35rem;">5% / 15% Y1-Y2</div>
+            <p style="font-size:0.9rem;color:var(--slate-text-muted);">Backloaded 5/15/40/40 RSU schedules leave 80% of equity unvested until Years 3–4, making Year-2 cash bridges essential.</p>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid var(--slate-border);border-radius:var(--radius-lg);padding:1.5rem;">
+            <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--emerald-dark);margin-bottom:0.4rem;">Finding #3 &bull; Geo-Arbitrage</div>
+            <div class="mono" style="font-size:1.75rem;font-weight:800;color:var(--navy-dark);margin-bottom:0.35rem;">125% Power</div>
+            <p style="font-size:0.9rem;color:var(--slate-text-muted);">Tier 1 Seattle (0% state tax, 88 COL) delivers ~125% real purchasing power compared to San Francisco (9.3% CA tax, 100 COL).</p>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid var(--slate-border);border-radius:var(--radius-lg);padding:1.5rem;">
+            <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;color:var(--emerald-dark);margin-bottom:0.4rem;">Finding #4 &bull; 83(b) Arbitrage</div>
+            <div class="mono" style="font-size:1.75rem;font-weight:800;color:var(--navy-dark);margin-bottom:0.35rem;">~17% Tax Spread</div>
+            <p style="font-size:0.9rem;color:var(--slate-text-muted);">Filing an 83(b) election within 30 days converts 5x–10x startup exit gains from ~37% ordinary income to ~20% long-term cap gains.</p>
+          </div>
+        </div>
+
+        <div class="section-header" style="margin-bottom:1.75rem;">
+          <span class="section-tag">Full 18-Track Dataset</span>
+          <h2 class="section-title">2026 Total Compensation Across All 18 Career Ladders</h2>
+          <p class="section-desc">Click any role below to inspect its complete L3–L7 percentile matrix and metro adjustments.</p>
+        </div>
+
+        <div class="matrix-table-wrap" style="background:#FFFFFF;border:1px solid var(--slate-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm);margin-bottom:2.5rem;">
+          <table class="progression-table">
+            <thead>
+              <tr>
+                <th>Career Track</th>
+                <th>Domain</th>
+                <th>YoY Growth</th>
+                <th>Entry Median TC</th>
+                <th>Mid/Senior Median TC</th>
+                <th>Principal/Partner TC</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}
+            </tbody>
+          </table>
+        </div>
+
+        <div style="background:#FFFFFF;border:1px solid var(--slate-border);border-radius:var(--radius-xl);padding:2rem;">
+          <h2 style="font-size:1.25rem;font-weight:800;color:var(--navy-dark);margin-bottom:0.5rem;">Cite This 2026 Compensation Study</h2>
+          <p style="font-size:0.9rem;color:var(--slate-text-muted);margin-bottom:0.75rem;">Journalists, recruiters, and career newsletters are welcome to cite benchmarks from this report with attribution to <strong>SalaryPathGuide.com</strong>.</p>
+          <code style="display:block;background:var(--slate-surface);border:1px solid var(--slate-border);border-radius:var(--radius-md);padding:0.85rem 1rem;font-size:0.8125rem;color:var(--navy-dark);overflow-x:auto;">Source: SalaryPathGuide 2026 Compensation &amp; Sign-On Cliff Report (${canonicalUrl})</code>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  ${renderFooter(roles)}
+</body>
+</html>`;
+}
+
 function main() {
   const careerData = loadCareerData();
   const roles = careerData.roles;
@@ -907,7 +1037,17 @@ function main() {
     });
   }
 
-  // 4. Write clean canonical sitemap.xml
+  // 4. Generate 2026 Compensation & Cliff Report page
+  const reportDir = path.join(ROOT_DIR, "reports", "2026-compensation-report");
+  ensureDir(reportDir);
+  fs.writeFileSync(path.join(reportDir, "index.html"), renderReportPage(roles), "utf8");
+  sitemapUrls.push({
+    loc: `${SITE_URL}/reports/2026-compensation-report/`,
+    changefreq: "monthly",
+    priority: "0.90"
+  });
+
+  // 5. Write clean canonical sitemap.xml
   const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -927,7 +1067,7 @@ ${sitemapUrls
 `;
   fs.writeFileSync(path.join(ROOT_DIR, "sitemap.xml"), sitemapXml, "utf8");
 
-  console.log(`Generated ${roles.length} role pages, ${roleCityCount} role-city pages, ${TOOL_PAGES.length} tool pages, ${COMPARE_PAGES.length} compare pages, and ${sitemapUrls.length} sitemap URLs.`);
+  console.log(`Generated ${roles.length} role pages, ${roleCityCount} role-city pages, ${TOOL_PAGES.length} tool pages, ${COMPARE_PAGES.length} compare pages, 1 annual report, and ${sitemapUrls.length} sitemap URLs.`);
 }
 
 main();
