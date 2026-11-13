@@ -1,8 +1,9 @@
 /**
- * SalaryPathGuide - High-Performance Offline-First Service Worker (v3.5)
- * Implements Stale-While-Revalidate for sub-100ms loads & full offline deep-link support.
+ * SalaryPathGuide - High-Performance Offline-First Service Worker (v3.6)
+ * Implements Network-First (no-store) for HTML navigation, Version-Aware Stale-While-Revalidate
+ * for static assets, and ignoreSearch offline fallback for deep-links.
  */
-const CACHE_NAME = "salarypathguide-v3.5";
+const CACHE_NAME = "salarypathguide-v3.6";
 const STATIC_ASSETS = [
   "/",
   "/index.html",
@@ -44,10 +45,10 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   if (!request.url.startsWith("http")) return;
 
-  // Navigation requests (including shared scenario deep-links ?r=...&b=...)
+  // Navigation requests: always bypass HTTP cache when online so deployments appear immediately
   if (request.mode === "navigate") {
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: "no-store" })
         .then((networkResponse) => {
           if (networkResponse && networkResponse.ok) {
             const copy = networkResponse.clone();
@@ -64,9 +65,9 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static assets & CDN libraries: Stale-While-Revalidate for sub-100ms instant load
+  // Static assets: Version-exact match first, Stale-While-Revalidate, ignoreSearch fallback when offline
   event.respondWith(
-    caches.match(request, { ignoreSearch: true }).then((cachedResponse) => {
+    caches.match(request).then((cachedResponse) => {
       const fetchPromise = fetch(request)
         .then((networkResponse) => {
           if (networkResponse && networkResponse.ok) {
@@ -75,7 +76,7 @@ self.addEventListener("fetch", (event) => {
           }
           return networkResponse;
         })
-        .catch(() => cachedResponse);
+        .catch(() => cachedResponse || caches.match(request, { ignoreSearch: true }));
 
       return cachedResponse || fetchPromise;
     })
