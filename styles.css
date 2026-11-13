@@ -689,7 +689,7 @@ input, select, textarea {
 
 .calc-grid {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 420px minmax(0, 1fr);
   min-height: 600px;
 }
 
@@ -701,6 +701,7 @@ input, select, textarea {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  min-width: 0;
 }
 
 .calc-controls-header {
@@ -890,6 +891,8 @@ input, select, textarea {
   flex-direction: column;
   gap: 2rem;
   background: #FFFFFF;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* Metrics Ribbon */
@@ -3232,6 +3235,8 @@ input, select, textarea {
   margin-top: 1.5rem;
   margin-bottom: 1.25rem;
   box-shadow: var(--shadow-sm);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .wealth-projector-header {
@@ -3256,7 +3261,7 @@ input, select, textarea {
 
 .wealth-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
   gap: 1rem;
   margin-bottom: 1.25rem;
 }
@@ -3291,13 +3296,18 @@ input, select, textarea {
 
 .wealth-controls-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
   gap: 1.25rem;
   background: var(--slate-surface);
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   margin-bottom: 1.25rem;
   border: 1px solid var(--slate-border);
+  min-width: 0;
+}
+
+.wealth-controls-grid > .form-group {
+  min-width: 0;
 }
 
 .wealth-fire-bar-wrap {
