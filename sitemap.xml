@@ -3,123 +3,142 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
         http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-
-  <!-- Primary Application Root -->
   <url>
     <loc>https://salarypathguide.com/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.00</priority>
   </url>
-
-  <!-- Career Track Deep Trajectory Routes -->
   <url>
-    <loc>https://salarypathguide.com/?r=swe</loc>
+    <loc>https://salarypathguide.com/salaries/software-engineer/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=qa</loc>
+    <loc>https://salarypathguide.com/salaries/qa-automation-engineer-sdet/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=pm</loc>
+    <loc>https://salarypathguide.com/salaries/product-manager/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=da</loc>
+    <loc>https://salarypathguide.com/salaries/data-analyst-and-analytics-engineer/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=ds</loc>
+    <loc>https://salarypathguide.com/salaries/data-scientist-and-machine-learning-engineer/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=devops</loc>
+    <loc>https://salarypathguide.com/salaries/cloud-and-devops-sre-engineer/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=cyber</loc>
+    <loc>https://salarypathguide.com/salaries/cyber-security-engineer/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=em</loc>
+    <loc>https://salarypathguide.com/salaries/engineering-manager/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=mobile</loc>
+    <loc>https://salarypathguide.com/salaries/mobile-software-engineer-ios-and-android/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=quant</loc>
+    <loc>https://salarypathguide.com/salaries/quantitative-developer-fintech-systems/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=dentist</loc>
+    <loc>https://salarypathguide.com/salaries/general-dentist-and-dental-specialist/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=physician</loc>
+    <loc>https://salarypathguide.com/salaries/physician-medical-doctor/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=attorney</loc>
+    <loc>https://salarypathguide.com/salaries/corporate-attorney-legal-counsel/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=ib</loc>
+    <loc>https://salarypathguide.com/salaries/investment-banking-and-private-equity/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=ai_research</loc>
+    <loc>https://salarypathguide.com/salaries/ai-research-scientist-and-foundation-model-engineer/</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://salarypathguide.com/salaries/ml-platform-mlops-engineer/</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://salarypathguide.com/salaries/product-designer-ux-and-systems/</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://salarypathguide.com/salaries/technical-program-manager-tpm/</loc>
+    <lastmod>2026-11-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://salarypathguide.com/tools/sign-on-cliff-detector/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=ml_platform</loc>
+    <loc>https://salarypathguide.com/tools/83b-election-calculator/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.90</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=product_designer</loc>
+    <loc>https://salarypathguide.com/tools/fire-compensation-projector/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.90</priority>
   </url>
   <url>
-    <loc>https://salarypathguide.com/?r=tpm</loc>
+    <loc>https://salarypathguide.com/tools/geo-arbitrage-calculator/</loc>
     <lastmod>2026-11-13</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.85</priority>
+    <priority>0.90</priority>
   </url>
-
 </urlset>
