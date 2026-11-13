@@ -3,7 +3,7 @@
  * Implements Network-First (no-store) for HTML navigation, Version-Aware Stale-While-Revalidate
  * for static assets, and ignoreSearch offline fallback for deep-links.
  */
-const CACHE_NAME = "salarypathguide-v4.0";
+const CACHE_NAME = "salarypathguide-v4.1";
 const STATIC_ASSETS = [
   "/",
   "/index.html",

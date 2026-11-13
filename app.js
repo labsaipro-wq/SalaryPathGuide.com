@@ -937,6 +937,7 @@ document.addEventListener("DOMContentLoaded", () => {
           standard: [0.25, 0.25, 0.25, 0.25, 0.0],
           amazon: [0.05, 0.15, 0.40, 0.40, 0.0],
           frontloaded: [0.33, 0.33, 0.22, 0.12, 0.0],
+          ai_lab: [0.15, 0.25, 0.30, 0.30, 0.0],
           uniform: [0.20, 0.20, 0.20, 0.20, 0.20]
         };
         const rates = scheduleMap[state.equityVestingSchedule] || scheduleMap.standard;
@@ -1121,6 +1122,7 @@ document.addEventListener("DOMContentLoaded", () => {
       standard: [0.25, 0.25, 0.25, 0.25, 0.0],
       amazon: [0.05, 0.15, 0.40, 0.40, 0.0],
       frontloaded: [0.33, 0.33, 0.22, 0.12, 0.0],
+      ai_lab: [0.15, 0.25, 0.30, 0.30, 0.0],
       uniform: [0.20, 0.20, 0.20, 0.20, 0.20]
     };
     const rates = scheduleMap[state.equityVestingSchedule] || scheduleMap.standard;

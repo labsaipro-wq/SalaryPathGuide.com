@@ -1048,6 +1048,239 @@ const CAREER_DATA = {
           ]
         }
       ]
+    },
+    {
+      id: "ml_platform",
+      title: "ML Platform / MLOps Engineer",
+      category: "Data & AI",
+      shortDesc: "Architects GPU cluster orchestration, distributed model training pipelines, LLM inference serving, and feature stores.",
+      marketGrowth: "+28.4% YoY",
+      topSpecialties: ["GPU Cluster & CUDA Ops", "LLM Inference Serving", "Feature Stores & Ray", "ML CI/CD & Evals"],
+      levels: [
+        {
+          code: "L3",
+          name: "Junior ML Platform Engineer",
+          yoe: "0 - 2 Years",
+          base: { p25: 105000, p50: 122000, p75: 142000, p90: 162000 },
+          bonusPct: 10,
+          equityAnnual: 25000,
+          scope: "Maintains containerized training jobs, model registries, and inference telemetry pipelines under senior guidance.",
+          skills: ["Python & PyTorch", "Docker & Kubernetes", "CI/CD Pipelines", "Weights & Biases / MLflow"],
+          upskillPath: [
+            "Automate reproducible model evaluation gates and canary inference rollouts.",
+            "Profile GPU utilization and memory bottlenecks across multi-node training jobs."
+          ]
+        },
+        {
+          code: "L4",
+          name: "Mid-Level MLOps Engineer",
+          yoe: "2 - 5 Years",
+          base: { p25: 145000, p50: 168000, p75: 195000, p90: 220000 },
+          bonusPct: 12,
+          equityAnnual: 55000,
+          scope: "Owns production LLM/ML serving infrastructure, autoscaling GPU pools, and low-latency quantization pipelines.",
+          skills: ["vLLM / TensorRT-LLM", "Ray / Kubeflow", "Terraform & AWS/GCP GPU", "Latency & Cost Telemetry"],
+          upskillPath: [
+            "Cut per-token serving costs by 35%+ via speculative decoding, batching, and FP8 quantization.",
+            "Build self-service fine-tuning and RAG indexing workflows for product engineering teams."
+          ]
+        },
+        {
+          code: "L5",
+          name: "Senior ML Platform Engineer",
+          yoe: "5 - 8 Years",
+          base: { p25: 185000, p50: 215000, p75: 250000, p90: 290000 },
+          bonusPct: 15,
+          equityAnnual: 110000,
+          scope: "Designs multi-region AI infrastructure, Slurm/K8s cluster scheduling, and reliability SLAs for mission-critical models.",
+          skills: ["Distributed Training (FSDP/DeepSpeed)", "Multi-Region Inference", "Custom K8s Operators", "Capacity Planning"],
+          upskillPath: [
+            "Architect unified training-to-serving feature & eval platforms across 5+ product squads.",
+            "Lead build-vs-buy decisions for GPU cloud reservations and inference hardware."
+          ]
+        },
+        {
+          code: "L6",
+          name: "Staff ML Infrastructure Architect",
+          yoe: "8 - 12+ Years",
+          base: { p25: 235000, p50: 275000, p75: 325000, p90: 385000 },
+          bonusPct: 20,
+          equityAnnual: 210000,
+          scope: "Sets company-wide AI compute architecture, negotiates multi-million-dollar GPU capacity, and shapes ML platform strategy.",
+          skills: ["Enterprise AI Compute Strategy", "NCCL & RDMA Networking", "Org-Wide Platform Governance", "Vendor Negotiation"],
+          upskillPath: [
+            "Direct multi-year AI compute roadmap with VP Engineering and CFO."
+          ]
+        },
+        {
+          code: "L7",
+          name: "Principal AI Infrastructure Fellow",
+          yoe: "12+ Years",
+          base: { p25: 295000, p50: 345000, p75: 410000, p90: 495000 },
+          bonusPct: 25,
+          equityAnnual: 380000,
+          scope: "Defines frontier cluster architecture, custom kernel acceleration, and multi-year AI infrastructure differentiation.",
+          skills: ["Custom CUDA / Triton Kernels", "Frontier Cluster Architecture", "Executive & Board Advisory"],
+          upskillPath: [
+            "Pioneer proprietary inference/training systems that unlock step-function margin advantages."
+          ]
+        }
+      ]
+    },
+    {
+      id: "product_designer",
+      title: "Product Designer (UX & Systems)",
+      category: "Product",
+      shortDesc: "Crafts intuitive end-to-end product experiences, scalable design systems, interaction prototypes, and AI-native UX flows.",
+      marketGrowth: "+6.2% YoY",
+      topSpecialties: ["Design Systems", "0-to-1 Product UX", "AI Copilots & Workflows", "Prototyping & Research"],
+      levels: [
+        {
+          code: "L3",
+          name: "Associate Product Designer",
+          yoe: "0 - 2 Years",
+          base: { p25: 82000, p50: 96000, p75: 112000, p90: 128000 },
+          bonusPct: 8,
+          equityAnnual: 12000,
+          scope: "Designs feature-level flows, applies design system tokens accurately, and partners closely with PMs and frontend engineers.",
+          skills: ["Figma & Auto-Layout", "Component Tokens", "Usability Testing", "Accessible UI (WCAG)"],
+          upskillPath: [
+            "Ship an end-to-end user flow from discovery research through engineering QA.",
+            "Master interactive prototyping and accessibility-first component states."
+          ]
+        },
+        {
+          code: "L4",
+          name: "Product Designer",
+          yoe: "2 - 5 Years",
+          base: { p25: 118000, p50: 138000, p75: 160000, p90: 185000 },
+          bonusPct: 10,
+          equityAnnual: 28000,
+          scope: "Independently owns core product surfaces, leads user research synthesis, and elevates conversion/retention metrics.",
+          skills: ["End-to-End Product Thinking", "Interactive Prototyping", "Quantitative UX Metrics", "Cross-Functional Alignment"],
+          upskillPath: [
+            "Tie design iterations directly to activation, retention, or revenue lift.",
+            "Contribute reusable patterns back to the company design system."
+          ]
+        },
+        {
+          code: "L5",
+          name: "Senior Product Designer",
+          yoe: "5 - 8 Years",
+          base: { p25: 155000, p50: 180000, p75: 210000, p90: 245000 },
+          bonusPct: 12,
+          equityAnnual: 55000,
+          scope: "Drives ambiguous 0-to-1 product vision, mentors designers, and shapes multi-quarter product & design system architecture.",
+          skills: ["0-to-1 Vision & Strategy", "Design Systems Architecture", "Executive Storytelling", "AI UX Patterns"],
+          upskillPath: [
+            "Lead a flagship product redesign or AI-native workflow across multiple squads.",
+            "Partner with Staff PM and Engineering leads on quarterly roadmap definition."
+          ]
+        },
+        {
+          code: "L6",
+          name: "Staff / Principal Product Designer",
+          yoe: "8 - 12+ Years",
+          base: { p25: 195000, p50: 228000, p75: 268000, p90: 315000 },
+          bonusPct: 18,
+          equityAnnual: 105000,
+          scope: "Defines company-wide UX coherence, leads cross-product design architecture, and raises the craft bar across the org.",
+          skills: ["Org-Wide UX Strategy", "Multi-Product Cohesion", "Executive Design Critiques", "Design Ops Leverage"],
+          upskillPath: [
+            "Establish company-wide design quality standards and mentor senior designers to Staff."
+          ]
+        },
+        {
+          code: "L7",
+          name: "VP / Distinguished Designer",
+          yoe: "12+ Years",
+          base: { p25: 250000, p50: 295000, p75: 350000, p90: 420000 },
+          bonusPct: 25,
+          equityAnnual: 210000,
+          scope: "Leads global product design organization, brand-product convergence, and C-suite product experience strategy.",
+          skills: ["Executive Product Leadership", "Org Scaling", "Brand & UX Convergence", "Board-Level Strategy"],
+          upskillPath: [
+            "Shape category-defining product identity and multi-year design org growth."
+          ]
+        }
+      ]
+    },
+    {
+      id: "tpm",
+      title: "Technical Program Manager (TPM)",
+      category: "Management",
+      shortDesc: "Orchestrates complex cross-org engineering initiatives, cloud migrations, launch readiness, and technical dependency risk.",
+      marketGrowth: "+8.1% YoY",
+      topSpecialties: ["Cross-Org Infra Programs", "AI & Data Platform Launches", "Security & Compliance", "Hardware-Software Sync"],
+      levels: [
+        {
+          code: "L3",
+          name: "Associate TPM",
+          yoe: "0 - 2 Years",
+          base: { p25: 90000, p50: 106000, p75: 124000, p90: 142000 },
+          bonusPct: 10,
+          equityAnnual: 15000,
+          scope: "Tracks sprint milestones, unblocks engineering dependencies, and coordinates release checklists across 1-2 teams.",
+          skills: ["Technical Fluency", "Risk & Dependency Mapping", "Release Management", "Stakeholder Comms"],
+          upskillPath: [
+            "Own an end-to-end feature launch across backend, frontend, and QA teams.",
+            "Build automated program health dashboards and SLA tracking."
+          ]
+        },
+        {
+          code: "L4",
+          name: "Technical Program Manager",
+          yoe: "2 - 5 Years",
+          base: { p25: 128000, p50: 148000, p75: 174000, p90: 198000 },
+          bonusPct: 12,
+          equityAnnual: 35000,
+          scope: "Drives multi-quarter cross-team technical programs, architecture review gates, and post-mortem reliability follow-through.",
+          skills: ["System Architecture Literacy", "Cross-Team Execution", "Incident & Reliability Governance", "KPI Reporting"],
+          upskillPath: [
+            "Lead a multi-team infrastructure migration or compliance certification (SOC2/FedRAMP).",
+            "Influence engineering trade-offs between scope, latency, and launch date."
+          ]
+        },
+        {
+          code: "L5",
+          name: "Senior Technical Program Manager",
+          yoe: "5 - 8 Years",
+          base: { p25: 165000, p50: 192000, p75: 225000, p90: 260000 },
+          bonusPct: 15,
+          equityAnnual: 70000,
+          scope: "Orchestrates org-wide flagship launches, aligns VP/Director stakeholders, and resolves systemic cross-org bottlenecks.",
+          skills: ["Org-Wide Program Strategy", "Executive Escalation", "Cloud Cost & Capacity Governance", "Technical Trade-off Analysis"],
+          upskillPath: [
+            "Direct company-wide AI platform rollout or global datacenter/cloud transition."
+          ]
+        },
+        {
+          code: "L6",
+          name: "Staff / Principal TPM",
+          yoe: "8 - 12+ Years",
+          base: { p25: 205000, p50: 240000, p75: 282000, p90: 330000 },
+          bonusPct: 20,
+          equityAnnual: 125000,
+          scope: "Steers multi-hundred-engineer initiatives across business units, M&A technical integrations, and annual planning cadence.",
+          skills: ["Enterprise Portfolio Governance", "M&A Tech Integration", "C-Suite Readiness Reviews", "Strategic Risk Mitigation"],
+          upskillPath: [
+            "Shape engineering operating rhythm and multi-year strategic program portfolio."
+          ]
+        },
+        {
+          code: "L7",
+          name: "Director of Technical Program Management",
+          yoe: "12+ Years",
+          base: { p25: 255000, p50: 298000, p75: 355000, p90: 425000 },
+          bonusPct: 25,
+          equityAnnual: 230000,
+          scope: "Leads global TPM organization, sets executive delivery governance, and partners with CTO/SVP on company-critical bets.",
+          skills: ["Global TPM Org Leadership", "CTO Staff Execution", "Capital & Headcount Allocation", "Board Reporting"],
+          upskillPath: [
+            "Scale high-leverage TPM org driving predictable delivery across all engineering divisions."
+          ]
+        }
+      ]
     }
   ],
 
@@ -1307,6 +1540,7 @@ const CAREER_DATA = {
     { id: "standard", name: "Standard 25% / 25% / 25% / 25% (Google, Meta, Apple)", rates: [0.25, 0.25, 0.25, 0.25, 0.0] },
     { id: "amazon", name: "Amazon Backloaded 5% / 15% / 40% / 40%", rates: [0.05, 0.15, 0.40, 0.40, 0.0] },
     { id: "frontloaded", name: "Frontloaded 33% / 33% / 22% / 12% (Snap, Startups)", rates: [0.33, 0.33, 0.22, 0.12, 0.0] },
+    { id: "ai_lab", name: "AI Lab Tender Schedule 15% / 25% / 30% / 30% (OpenAI, Anthropic, xAI)", rates: [0.15, 0.25, 0.30, 0.30, 0.0] },
     { id: "uniform", name: "Uniform 20% / yr (5-Year Health & Corporate Vesting)", rates: [0.20, 0.20, 0.20, 0.20, 0.20] }
   ],
 
